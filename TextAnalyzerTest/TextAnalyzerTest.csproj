@@ -18,4 +18,8 @@
       <ProjectReference Include="..\TextAnalyzer\TextAnalyzer.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\TextAnalyzer\TextAnalyzer.csproj" />
+    </ItemGroup>
+
 </Project>
