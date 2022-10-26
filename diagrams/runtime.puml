@@ -12,32 +12,32 @@ database DB
 activate Program
 activate UI
 
-
+loop until exit
 UI -> User: Main Menu (What to do)
 
-alt Analyze text
+alt New Sacan
 
-User --> UI: Select (analyze text)
-UI --> Program: Analyze text.
+User --> UI: Select (New Scan)
+UI --> Program: New Scan
 deactivate UI
 
-Program -> FileManager: Load file.
+Program -> FileManager: Load file
 activate FileManager
-FileManager -> FileManager: Create a\nQueue<String>\nfrom File.
+FileManager -> FileManager: Create a\nQueue<String>\nfrom File
 return Queue<String>
 
 
-Program -> Analyzer: Analyze text\nfrom queue.
+Program -> Analyzer: Analyze text\nfrom queue
 activate Analyzer
 Analyzer -> Analyzer: Go through\nqueue and\nanalyze
-return Result
+return Report
 
 'This is only ToString()
 Program -> Program: Create Report
 
-Program -> UI: Result
+Program -> UI: Report
 activate UI
-UI -> User: Result + "save Report?"
+UI -> User: Report + "save Report?"
 alt yes
 User --> UI: Save
 return: Save Report
@@ -49,9 +49,39 @@ return ok
 Program -> UI: Saved
 activate UI
 UI -> User: "Saved" + Main Menu
-end
 else no
 User --> UI: No
+end
+
+else Get Saved Scans
+
+User --> UI: Select (GetSaved Scans)
+return Get Saved Scans
+
+Program -> DB: SELECT (name, date) FROM scanlog
+activate DB
+return reports: (String, Date)[]
+
+Program -> UI: Which Report?
+activate UI
+UI -> User: Saved Report selection
+User --> UI: Select this scan
+return get this report
+
+Program -> DB:\
+SELECT * FROM scanlog\n\
+WHERE (name, Date)
+activate DB
+return Report
+
+Program -> UI: Report
+activate UI
+UI -> User: Report
+else Exit
+User --> UI: Exit
+return exit
+deactivate Program
+end
 end
 
 
