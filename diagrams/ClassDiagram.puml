@@ -5,7 +5,7 @@ class UIManager {
     void getSavedScan()
 }
 
-class MainManager {
+class Program {
     - AnalyseManager analyseManager
     - DBManager dbManager
     - FileManager fileManager
@@ -55,13 +55,13 @@ class FileManager {
     + retrieveQueArr()
 }
 
-UIManager <--> MainManager
-AnalyseManager <-> MainManager
+UIManager <--> Program
+AnalyseManager <-> Program
 AnalyseManager <-- AnalysesResult
 AnalysesResult -> DBManager
 
-MainManager <-> FileManager 
+Program <-> FileManager 
 
-MainManager <--> DBManager 
+Program <--> DBManager 
 
 @enduml

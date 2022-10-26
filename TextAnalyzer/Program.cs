@@ -1,3 +1,9 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿namespace TextAnalyzer; 
 
-Console.WriteLine("Hello, World!");
+public class Program {
+
+    public static void Main(String[] args)
+    {
+        Console.WriteLine("Hello World!");
+    }
+}
