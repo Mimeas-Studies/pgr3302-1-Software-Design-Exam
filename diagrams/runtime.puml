@@ -1,0 +1,58 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+'participents
+actor User
+participant UI
+participant Program
+entity Analyzer
+collections FileManager
+database DB
+
+activate Program
+activate UI
+
+
+UI -> User: Main Menu (What to do)
+
+alt Analyze text
+
+User --> UI: Select (analyze text)
+UI --> Program: Analyze text.
+deactivate UI
+
+Program -> FileManager: Load file.
+activate FileManager
+FileManager -> FileManager: Create a\nQueue<String>\nfrom File.
+return Queue<String>
+
+
+Program -> Analyzer: Analyze text\nfrom queue.
+activate Analyzer
+Analyzer -> Analyzer: Go through\nqueue and\nanalyze
+return Result
+
+'This is only ToString()
+Program -> Program: Create Report
+
+Program -> UI: Result
+activate UI
+UI -> User: Result + "save Report?"
+alt yes
+User --> UI: Save
+return: Save Report
+
+Program -> DB: Report
+activate DB
+return ok
+
+Program -> UI: Saved
+activate UI
+UI -> User: "Saved" + Main Menu
+end
+else no
+User --> UI: No
+end
+
+
+@enduml
