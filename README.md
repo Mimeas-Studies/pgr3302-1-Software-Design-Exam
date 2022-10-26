@@ -3,7 +3,7 @@
 ### Group Members: 
 
 * Kandidatnr. : 1100
-* Kandidatnr. : 
+* Kandidatnr. : 1040
 * Kandidatnr. : 
 * Kandidatnr. : 
 
@@ -19,3 +19,8 @@ etc.).
 
 - [ ] Initialize main program
 - [ ] Read txt.file
+
+### Feature list
+* [ ] Coloured U/I
+* [ ] Add multithreading to AnalyseManager
+* [ ] (AnalysesManager) User can check if input (String) exists in file.

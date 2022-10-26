@@ -1,0 +1,67 @@
+@startuml
+
+class UIManager {
+    void newScan()
+    void getSavedScan()
+}
+
+class MainManager {
+    - AnalyseManager analyseManager
+    - DBManager dbManager
+    - FileManager fileManager
+    - AnalysesResult AnalysesResult
+    
+    +Start()
+    +NewScan()
+    +SaceResult()
+    +DiscardResult()
+    +GetResults()
+}
+
+class AnalyseManager {
+    ..Fields..
+    - AnalysesResult AnalysesResult
+    ..Methods..
+    + AnalysesResult StartAnalysis()
+    - int fileSize()
+    - int totalWordCount()
+    - int totalCharCount()
+    - string longestWord()
+    - Map heatmapWord()
+    - Map heatmapChar()
+    
+}
+
+class AnalysesResult {
+    ..Fields / Properties..
+    + FileSize {get; set;}
+    + TotalWordCount {get; set;}
+    + TotalCharCount {get; set;}
+    + LongestWord {get; set;}
+    + HeatmapWord {get; set;}
+    + HeatmapChar {get; set;}
+    ..Methods..
+    + ToString()
+}
+
+class DBManager {
+    - AnalysesResult AnalysesResult
+    + saveData()
+    + retrieveData()
+}
+
+class FileManager {
+    + readFile()
+    + retrieveQueArr()
+}
+
+UIManager <--> MainManager
+AnalyseManager <-> MainManager
+AnalyseManager <-- AnalysesResult
+AnalysesResult -> DBManager
+
+MainManager <-> FileManager 
+
+MainManager <--> DBManager 
+
+@enduml
