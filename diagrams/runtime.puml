@@ -9,17 +9,18 @@ entity Analyzer
 collections FileManager
 database DB
 
-activate Program
-activate UI
+activate Program #gray
 
+activate UI
 loop until exit
-UI -> User: Main Menu (What to do)
+UI --> User: Main Menu (What to do)
 
 alt New Sacan
 
-User --> UI: Select (New Scan)
-UI --> Program: New Scan
+User -> UI: Select (New Scan)
+UI -> Program: New Scan
 deactivate UI
+activate Program
 
 Program -> FileManager: Load file
 activate FileManager
@@ -35,52 +36,64 @@ return Report
 'This is only ToString()
 Program -> Program: Create Report
 
-Program -> UI: Report
+Program --> UI: Report
+deactivate Program
 activate UI
-UI -> User: Report + "save Report?"
+UI --> User: Report + "save Report?"
 alt yes
-User --> UI: Save
-return: Save Report
+User -> UI: Save
+UI -> Program: Save Report
+deactivate UI
+activate Program
 
 Program -> DB: Report
 activate DB
-return ok
+return Ok
 
-Program -> UI: Saved
+Program --> UI: Saved
+deactivate Program
 activate UI
-UI -> User: "Saved" + Main Menu
+UI --> User: "Saved" + Main Menu
 else no
-User --> UI: No
+User -> UI: Don't Save
 end
 
 else Get Saved Scans
 
 User --> UI: Select (GetSaved Scans)
-return Get Saved Scans
+UI -> Program: Get Saved Scans
+deactivate UI
+activate Program
 
 Program -> DB: SELECT (name, date) FROM scanlog
 activate DB
 return reports: (String, Date)[]
 
-Program -> UI: Which Report?
+Program --> UI: Report list
+deactivate Program
 activate UI
-UI -> User: Saved Report selection
-User --> UI: Select this scan
-return get this report
+UI --> User: Saved Report selection
+User -> UI: Select this scan
+UI -> Program: Get this report
+deactivate UI
 
+activate Program
 Program -> DB:\
 SELECT * FROM scanlog\n\
 WHERE (name, Date)
 activate DB
 return Report
 
-Program -> UI: Report
-activate UI
-UI -> User: Report
-else Exit
-User --> UI: Exit
-return exit
+Program --> UI: Report
 deactivate Program
+activate UI
+UI --> User: Report
+
+else Exit
+User -> UI: Exit
+UI -> Program: Exit
+deactivate UI
+deactivate Program #gray
 end
 end
 
