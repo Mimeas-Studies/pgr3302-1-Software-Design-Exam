@@ -9,9 +9,7 @@
 
     <ItemGroup>
       <None Remove="Resources\Lorem Ipsum 500.txt" />
-      <Content Include="Resources\Lorem Ipsum 500.txt">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
+      <None Remove="Resources\Random Ipsum 1 500 000.txt" />
     </ItemGroup>
 
 </Project>
