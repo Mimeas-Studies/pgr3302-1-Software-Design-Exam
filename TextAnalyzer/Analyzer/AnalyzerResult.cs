@@ -1,9 +1,8 @@
-namespace TextAnalyzer; 
+namespace TextAnalyzer.Analyzer; 
 
 public class AnalyzerResult {
     
     public AnalyzerResult() {
-        // FileSize = 0;
         TotalWordCount = 0;
         TotalCharCount = 0;
         LongestWord = "";
@@ -11,7 +10,6 @@ public class AnalyzerResult {
         HeatmapChar = new Dictionary<string, int>();
     }
 
-    // public int FileSize { get; set; }
     public int TotalWordCount { get; set; }
     public int TotalCharCount { get; set; }
     public string LongestWord { get; set; }
