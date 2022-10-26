@@ -20,21 +20,20 @@ class Program {
 
 class AnalyseManager {
     ..Fields..
-    - AnalysesResult AnalysesResult
+    - Queue<string> Text { get; set; }
+    - AnalysesResult Result { get; set; }
     ..Methods..
-    + AnalysesResult StartAnalysis()
-    - int fileSize()
-    - int totalWordCount()
-    - int totalCharCount()
-    - string longestWord()
-    - Map heatmapWord()
-    - Map heatmapChar()
+    + StartAnalysis() : AnalyzerResult
+    - TotalWordCount()
+    - TotalCharCount()
+    - CheckLongestWord()
+    - HeatmapWord()
+    - HeatmapChar()
     
 }
 
 class AnalysesResult {
     ..Fields / Properties..
-    + FileSize {get; set;}
     + TotalWordCount {get; set;}
     + TotalCharCount {get; set;}
     + LongestWord {get; set;}
