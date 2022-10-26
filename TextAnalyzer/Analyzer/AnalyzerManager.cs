@@ -2,17 +2,23 @@ namespace TextAnalyzer.Analyzer;
 
 public class AnalyzerManager {
 
-    private Queue<string> Text { get; set; } = null!;
-    private AnalyzerResult Result { get; set; }
+    public int Threads { get; set; }
+    public Queue<string> Text { get; set; } = null!;
+    public AnalyzerResult Result { get; set; }
+    public string Word { get; set; }
 
-    public AnalyzerManager() {
+    public AnalyzerManager(Queue<string> text, int threads) {
         Result = new AnalyzerResult();
+        Threads = threads;
+        Text = text;
+        Word = "";
     }
 
-    public AnalyzerResult StartAnalyze(Queue<string> text) {
-        Text = text;
-
+    public AnalyzerResult StartAnalyze() {
+        
         while (Text.Count > 0) {
+            Word = Text.Dequeue();
+            
             TotalWordCount();
             TotalCharCount();
             CheckLongestWord();
@@ -25,23 +31,40 @@ public class AnalyzerManager {
 
 
     private void TotalWordCount() {
-        throw new NotImplementedException();
+        Result.TotalWordCount++;
     }
 
     private void TotalCharCount() {
-        throw new NotImplementedException();
+        var array = Word.ToCharArray();
+        Result.TotalCharCount += array.Length;
     }
 
     private void CheckLongestWord() {
-        throw new NotImplementedException();
+        if (Word.Length > Result.LongestWord.Length) {
+            Result.LongestWord += Word;
+        }
     }
 
     private void HeatmapWord() {
-        throw new NotImplementedException();
+        if (Result.HeatmapWord.ContainsKey(Word)) {
+            Result.HeatmapWord[Word]++;
+        }
+        
+        else {
+            Result.HeatmapWord.Add(Word, 1);
+        }
     }
 
     private void HeatmapChar() {
-        throw new NotImplementedException();
+        var wordArray = Word.ToCharArray();
+        foreach (var ch in wordArray) {
+            if (Result.HeatmapChar.ContainsKey(ch)) {
+                Result.HeatmapChar[ch]++;
+            }
+            else {
+                Result.HeatmapChar.Add(ch, 1);
+            }
+        }
     }
     
 }
