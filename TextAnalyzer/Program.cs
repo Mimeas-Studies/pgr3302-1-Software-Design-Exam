@@ -1,9 +1,18 @@
-﻿namespace TextAnalyzer; 
+﻿using TextAnalyzer.Analyzer;
 
-public class Program {
+namespace TextAnalyzer;
+
+public class Program
+{
+    internal static bool IsProgramRunning = true;
 
     public static void Main(String[] args)
     {
-        Console.WriteLine("Hello World!");
+        while (IsProgramRunning)
+        {
+            Ui.PrintMenu();
+            MenuHandler.menuHandler();
+            Console.Clear();
+        }
     }
 }
