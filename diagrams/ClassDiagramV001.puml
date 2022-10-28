@@ -1,16 +1,24 @@
 ﻿@startuml
 
 class UIManager {
+    ..Fields..
+    ..Methods..
     void newScan()
     void getSavedScan()
 }
 
+class MenuHandler {
+    + static void MenuHandler()
+}
+
 class Program {
+    ..Fields..
     - AnalyseManager analyseManager
     - DBManager dbManager
     - FileManager fileManager
     - AnalysesResult AnalysesResult
     
+    ..Methods..
     +Start()
     +NewScan()
     +SaveResult()
@@ -20,8 +28,10 @@ class Program {
 
 class AnalyseManager {
     ..Fields..
+    - int Threads { get; set; }
     - Queue<string> Text { get; set; }
     - AnalysesResult Result { get; set; }
+    - string Word { get; set; }
     ..Methods..
     + StartAnalysis() : AnalyzerResult
     - TotalWordCount()
@@ -33,7 +43,7 @@ class AnalyseManager {
 }
 
 class AnalysesResult {
-    ..Fields / Properties..
+    ..Fields..
     + TotalWordCount {get; set;}
     + TotalCharCount {get; set;}
     + LongestWord {get; set;}
@@ -44,17 +54,22 @@ class AnalysesResult {
 }
 
 class DBManager {
+    ..Fields..
     - AnalysesResult AnalysesResult
+    ..Methods..
     + saveData()
     + retrieveData()
 }
 
 class FileManager {
-    + readFile()
-    + retrieveQueArr()
+    ..Fields..
+    ..Methods..
+    + getText()
 }
 
 UIManager <--> Program
+UIManager <- MenuHandler
+
 AnalyseManager <-> Program
 AnalyseManager <-- AnalysesResult
 AnalysesResult -> DBManager
