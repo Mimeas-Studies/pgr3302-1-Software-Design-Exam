@@ -1,13 +1,14 @@
-namespace TextAnalyzer.Analyzer; 
+namespace TextAnalyzer.Analyzer;
 
-public class AnalyzerManager {
+//This class is going to be deleted after multithreading is implemented. 
+public class AnalyzerResultMultithreadingTmp {
     
     public AnalyzerResult Result { get; set; }
     private int Threads { get; set; }
     private Queue<string> Text { get; set; }
     private string Word { get; set; }
 
-    public AnalyzerManager(Queue<string> text, int threads) {
+    public AnalyzerResultMultithreadingTmp(Queue<string> text, int threads) {
         Result = new AnalyzerResult();
         Threads = threads;
         Text = text;
@@ -68,3 +69,4 @@ public class AnalyzerManager {
     }
     
 }
+    

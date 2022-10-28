@@ -1,6 +1,6 @@
 namespace TextAnalyzer;
 
-public static class FileManager
+public class FileManager
 {
     //  Returns a Queue of words from a filepath
     public static Queue<string> GetText(string filepath)
