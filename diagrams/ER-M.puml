@@ -1,0 +1,10 @@
+@startuml
+'https://plantuml.com/component-diagram
+
+class Scan {
+    time: DateTime
+    source: Varchar(256)
+    
+}
+
+@enduml

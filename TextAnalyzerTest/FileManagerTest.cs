@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using TextAnalyzer;
+using TextAnalyzer.Analyzer;
 
 namespace TextAnalyzerTest;
 
@@ -19,5 +20,16 @@ public class Tests {
         var manyWords = FileManager.GetText("Random Ipsum 1 500 131.txt");
         
         Assert.That(manyWords.Count, Is.EqualTo(1_500_131));
+    }
+
+    [Test]
+    public void Analyze1500131Words()
+    {
+        var manyWords = FileManager.GetText("Random Ipsum 1 500 131.txt");
+
+        var manager = new AnalyzerManager(manyWords, 1);
+        var result = manager.StartAnalyze();
+        
+        Assert.AreEqual(1_500_131, result.TotalWordCount);
     }
 }
