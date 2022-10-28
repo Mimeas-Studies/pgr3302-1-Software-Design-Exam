@@ -2,9 +2,18 @@
 'https://plantuml.com/component-diagram
 
 class Scan {
+    scanid: int
     time: DateTime
-    source: Varchar(256)
-    
+    source: Varchar[256]
+    wordCount: int
+    charCount: int
+    longestWord: Varchar[256]
+}
+
+class wordmap {
+    scanid: int
+    word: varchar[256]
+    count: int
 }
 
 @enduml
