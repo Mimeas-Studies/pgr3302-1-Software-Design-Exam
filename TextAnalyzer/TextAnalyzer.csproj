@@ -10,17 +10,12 @@
     <ItemGroup>
       <None Remove="Resources\Lorem Ipsum 500.txt" />
       <None Remove="Resources\Random Ipsum 1 500 000.txt" />
-      <None Update="Samples\Sample.txt">
+      <None Update="Resources\Lorem_Ipsum_500.txt">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-    </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.0-rc.2.22472.11" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="TextAnalyzerDB" />
+      <None Update="Resources\Random_Ipsum_1_500_131.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>
