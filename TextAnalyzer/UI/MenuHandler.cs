@@ -1,11 +1,13 @@
 ﻿namespace TextAnalyzer.Analyzer;
 
-public class MenuHandler
-{
-    internal static void menuHandler()
+public class MenuHandler {
+
+    
+    public static void menuHandler()
     {
         Console.WriteLine("\nType in menu option number and press <Enter>");
         var selectedMenuOption = Console.ReadLine();
+        MainManager mainManager = new MainManager();
 
         switch (selectedMenuOption)
         {
@@ -19,9 +21,10 @@ public class MenuHandler
                         Thread.Sleep(20);
                     }
                 }
+                Console.Clear();
                 break;
             case "2":
-                
+                mainManager.start();
                 break;
             case "3":
                 break;
