@@ -12,4 +12,12 @@
       <None Remove="Resources\Random Ipsum 1 500 000.txt" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.0-rc.2.22472.11" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="TextAnalyzerDB" />
+    </ItemGroup>
+
 </Project>
