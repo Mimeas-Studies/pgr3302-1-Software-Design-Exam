@@ -1,11 +1,11 @@
 namespace TextAnalyzer.Analyzer; 
 
 public class AnalyzerManager {
-
-    public int Threads { get; set; }
-    public Queue<string> Text { get; set; } = null!;
+    
     public AnalyzerResult Result { get; set; }
-    public string Word { get; set; }
+    private int Threads { get; set; }
+    private Queue<string> Text { get; set; }
+    private string Word { get; set; }
 
     public AnalyzerManager(Queue<string> text, int threads) {
         Result = new AnalyzerResult();
@@ -58,11 +58,11 @@ public class AnalyzerManager {
     private void HeatmapChar() {
         var wordArray = Word.ToCharArray();
         foreach (var ch in wordArray) {
-            if (Result.HeatmapChar.ContainsKey(ch)) {
-                Result.HeatmapChar[ch]++;
+            if (Result.HeatmapChar.ContainsKey(ch.ToString())) {
+                Result.HeatmapChar[ch.ToString()]++;
             }
             else {
-                Result.HeatmapChar.Add(ch, 1);
+                Result.HeatmapChar.Add(ch.ToString(), 1);
             }
         }
     }
