@@ -2,7 +2,7 @@
 'https://plantuml.com/component-diagram
 
 class Scan {
-    scanid: int
+    scanid: int {PK}
     time: DateTime
     source: Varchar[256]
     wordCount: int
@@ -11,9 +11,18 @@ class Scan {
 }
 
 class wordmap {
-    scanid: int
-    word: varchar[256]
+    scanid: int {PK,FK}
+    word: varchar[256] {PK}
     count: int
 }
+
+class charmap {
+    scanid: id {PK, FK}
+    char: char[1] {PK}
+    count: int
+}
+
+Scan "*"--"1,1" wordmap
+Scan "*"--"1,1" charmap
 
 @enduml
