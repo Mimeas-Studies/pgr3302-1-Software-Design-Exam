@@ -20,37 +20,30 @@ public class MenuHandler
                     }
                 }
                 break;
-            case "2":
-                
+            case "2": 
                 break;
             case "3":
                 break;
             case "4":
-                try
-                {
-                    StreamWriter sw = new StreamWriter(
-                        "Samples/Sample.txt"
-                        );
+                // getting value written in Console.WriteLine 
+                Console.WriteLine("Enter text: ");
+                string? text = Console.ReadLine(); 
+                // file handling 
+ 
+                StreamWriter writeText = new StreamWriter("Samples/Sample.txt"); 
+                writeText.WriteLine(text); 
+                writeText.Flush(); 
+                writeText.Close(); 
                 
-                    Console.WriteLine("Enter text: ");
-                    string text = Console.ReadLine();
-                    sw.WriteLine(text);
-                    sw.Flush();
-                    sw.Close();
-                }
-                catch(Exception e)
-                {
-                    Console.WriteLine("Exception: " + e.Message);
-                }
-                finally
-                {
-                    Console.WriteLine("Executing finally block.");
-                }
+                Console.WriteLine("Return to main menu...");
+
                 break;
             
             case "5":
                 Console.WriteLine("Exiting...");
                 Program.IsProgramRunning = false; 
+                break;
+            default:// do nothing;
                 break;
         }
     }
