@@ -2,6 +2,7 @@ namespace TextAnalyzer.Analyzer;
 
 public class AnalyzerResult {
     
+    //Reason for initialise is to have zero null values and to have guard values 
     public AnalyzerResult() {
         TotalWordCount = 0;
         TotalCharCount = 0;
@@ -26,7 +27,6 @@ public class AnalyzerResult {
     }
     
     private static string ToStringHeatmap(Dictionary<string, int> heatMap) {
-        
         var highestValue = 0;
         var strValue = "";
 

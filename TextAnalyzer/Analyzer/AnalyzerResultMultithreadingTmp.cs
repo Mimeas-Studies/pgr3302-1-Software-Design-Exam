@@ -2,20 +2,33 @@ namespace TextAnalyzer.Analyzer;
 
 //This class is going to be deleted after multithreading is implemented. 
 public class AnalyzerResultMultithreadingTmp {
-    
-    public AnalyzerResult Result { get; set; }
-    private int Threads { get; set; }
-    private Queue<string> Text { get; set; }
-    private string Word { get; set; }
 
-    public AnalyzerResultMultithreadingTmp(Queue<string> text, int threads) {
-        Result = new AnalyzerResult();
+    private readonly AnalyzerResult _result = new AnalyzerResult();
+    
+    private Queue<string> Text { get; set; } = null!;
+    private string Word { get; set; } = "";
+
+    private Thread[] Threads { get; set; }
+    
+    private AnalyzerResultMultithreadingTmp(Thread[] threads) {
         Threads = threads;
+    }
+    
+    public AnalyzerResultMultithreadingTmp(Queue<string> text, Thread[] threads1, int threads = 1) {
+        // User input shall be 1-8, in case of wrong make default 1. 
+        if (threads < 1 || threads > 8) threads = 1;
         Text = text;
-        Word = "";
+        Threads = new Thread[threads];
+        
+        for (int thread = 0; thread < threads; thread++) {
+            // Threads[thread] = new Thread(new ThreadStart(new AnalyzerResultMultithreadingTmp()));
+        }
+        
     }
 
     public AnalyzerResult StartAnalyze() {
+
+        var result = new AnalyzerResult();
         
         while (Text.Count > 0) {
             Word = Text.Dequeue();
@@ -27,43 +40,43 @@ public class AnalyzerResultMultithreadingTmp {
             HeatmapChar();
         }
 
-        return Result;
+        return _result;
     }
 
 
     private void TotalWordCount() {
-        Result.TotalWordCount++;
+        _result.TotalWordCount++;
     }
 
     private void TotalCharCount() {
         var array = Word.ToCharArray();
-        Result.TotalCharCount += array.Length;
+        _result.TotalCharCount += array.Length;
     }
 
     private void CheckLongestWord() {
-        if (Word.Length > Result.LongestWord.Length) {
-            Result.LongestWord += Word;
+        if (Word.Length > _result.LongestWord.Length) {
+            _result.LongestWord += Word;
         }
     }
 
     private void HeatmapWord() {
-        if (Result.HeatmapWord.ContainsKey(Word)) {
-            Result.HeatmapWord[Word]++;
+        if (_result.HeatmapWord.ContainsKey(Word)) {
+            _result.HeatmapWord[Word]++;
         }
         
         else {
-            Result.HeatmapWord.Add(Word, 1);
+            _result.HeatmapWord.Add(Word, 1);
         }
     }
 
     private void HeatmapChar() {
         var wordArray = Word.ToCharArray();
         foreach (var ch in wordArray) {
-            if (Result.HeatmapChar.ContainsKey(ch.ToString())) {
-                Result.HeatmapChar[ch.ToString()]++;
+            if (_result.HeatmapChar.ContainsKey(ch.ToString())) {
+                _result.HeatmapChar[ch.ToString()]++;
             }
             else {
-                Result.HeatmapChar.Add(ch.ToString(), 1);
+                _result.HeatmapChar.Add(ch.ToString(), 1);
             }
         }
     }
