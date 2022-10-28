@@ -10,6 +10,9 @@
     <ItemGroup>
       <None Remove="Resources\Lorem Ipsum 500.txt" />
       <None Remove="Resources\Random Ipsum 1 500 000.txt" />
+      <None Update="Samples\Sample.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
     <ItemGroup>
