@@ -26,6 +26,29 @@ public class MenuHandler
             case "3":
                 break;
             case "4":
+                try
+                {
+                    StreamWriter sw = new StreamWriter(
+                        "Samples/Sample.txt"
+                        );
+                
+                    Console.WriteLine("Enter text: ");
+                    string text = Console.ReadLine();
+                    sw.WriteLine(text);
+                    sw.Flush();
+                    sw.Close();
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine("Exception: " + e.Message);
+                }
+                finally
+                {
+                    Console.WriteLine("Executing finally block.");
+                }
+                break;
+            
+            case "5":
                 Console.WriteLine("Exiting...");
                 Program.IsProgramRunning = false; 
                 break;
