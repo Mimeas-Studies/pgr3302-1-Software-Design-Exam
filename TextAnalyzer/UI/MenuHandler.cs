@@ -41,7 +41,7 @@ public class MenuHandler {
 
                 if (fileName != null)
                 {
-                    string path = Path.Combine ("Resources", fileName);
+                    string path = Path.Combine ("Resources", fileName + ".txt");
 
                     if (!File.Exists(path))
                     {
