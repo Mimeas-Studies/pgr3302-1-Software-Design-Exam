@@ -35,26 +35,27 @@ public class MenuHandler {
             case "3":
                 break;
             case "4":
-                try
-                {
-                    StreamWriter sw = new StreamWriter(
-                        "Samples/Sample.txt"
-                        );
                 
-                    Console.WriteLine("Enter text: ");
-                    string text = Console.ReadLine();
-                    sw.WriteLine(text);
-                    sw.Flush();
-                    sw.Close();
-                }
-                catch(Exception e)
+                Console.WriteLine("Enter file name: ");
+                string fileName = Console.ReadLine();
+
+                if (fileName != null)
                 {
-                    Console.WriteLine("Exception: " + e.Message);
+                    string path = Path.Combine ("Resources", fileName);
+
+                    if (!File.Exists(path))
+                    {
+                        StreamWriter sw = new StreamWriter(
+                            path
+                        );
+                        Console.WriteLine("Enter text: ");
+                        string text = Console.ReadLine();
+                        sw.WriteLine(text);
+                        sw.Flush();
+                        sw.Close();
+                    }
                 }
-                finally
-                {
-                    Console.WriteLine("Executing finally block.");
-                }
+
                 break;
             
             case "5":
