@@ -11,6 +11,7 @@ public class MenuHandler {
         var selectedMenuOption = Console.ReadLine();
         MainManager mainManager = new MainManager();
         FileDisplayer fileDisplayer = new FileDisplayer();
+        CreateNewFiles createNewFiles = new CreateNewFiles();
 
         switch (selectedMenuOption)
         {
@@ -35,26 +36,7 @@ public class MenuHandler {
             case "3":
                 break;
             case "4":
-                
-                Console.WriteLine("Enter file name: ");
-                string fileName = Console.ReadLine();
-
-                if (fileName != null)
-                {
-                    string path = Path.Combine ("Resources", fileName + ".txt");
-
-                    if (!File.Exists(path))
-                    {
-                        StreamWriter sw = new StreamWriter(
-                            path
-                        );
-                        Console.WriteLine("Enter text: ");
-                        string text = Console.ReadLine();
-                        sw.WriteLine(text);
-                        sw.Flush();
-                        sw.Close();
-                    }
-                }
+                createNewFiles.CreateTxtFile();
 
                 break;
             
