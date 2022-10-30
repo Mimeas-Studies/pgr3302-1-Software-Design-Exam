@@ -1,4 +1,6 @@
-﻿namespace TextAnalyzer.Analyzer;
+﻿using TextAnalyzer.UI;
+
+namespace TextAnalyzer.Analyzer;
 
 public class MenuHandler {
 
@@ -8,10 +10,13 @@ public class MenuHandler {
         Console.WriteLine("\nType in menu option number and press <Enter>");
         var selectedMenuOption = Console.ReadLine();
         MainManager mainManager = new MainManager();
+        FileDisplayer fileDisplayer = new FileDisplayer();
+        CreateNewFiles createNewFiles = new CreateNewFiles();
 
         switch (selectedMenuOption)
         {
             case "1":
+                fileDisplayer.displayStoredFiles();
                 Console.WriteLine("Analyzing Text ...");
                 using (var progress = new ProgressBar())
                 {
@@ -22,33 +27,17 @@ public class MenuHandler {
                     }
                 }
                 Console.Clear();
+                mainManager.start(fileDisplayer.getSelectedFile());
+                Console.WriteLine("\n Type in (1) to save.\n Type in (2) to discard.");
+                Console.ReadLine();
                 break;
             case "2":
-                mainManager.start();
                 break;
             case "3":
                 break;
             case "4":
-                try
-                {
-                    StreamWriter sw = new StreamWriter(
-                        "Samples/Sample.txt"
-                        );
-                
-                    Console.WriteLine("Enter text: ");
-                    string text = Console.ReadLine();
-                    sw.WriteLine(text);
-                    sw.Flush();
-                    sw.Close();
-                }
-                catch(Exception e)
-                {
-                    Console.WriteLine("Exception: " + e.Message);
-                }
-                finally
-                {
-                    Console.WriteLine("Executing finally block.");
-                }
+                createNewFiles.CreateTxtFile();
+
                 break;
             
             case "5":
