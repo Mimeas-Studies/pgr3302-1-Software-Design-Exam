@@ -2,4 +2,4 @@
 */bin/
 */obj/
 */.user
-*/pg3302-exam.sln.DotSettings.user
+*.sln.DotSettings.user
