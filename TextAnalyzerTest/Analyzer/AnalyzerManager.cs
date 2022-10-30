@@ -36,11 +36,11 @@ public class AnalyzerManagerTest {
         Assert.AreEqual(1, Manager.Result.HeatmapWord["Hello"]);
         
         Assert.AreEqual(4, Manager.Result.HeatmapChar.Count);
-        Assert.AreEqual(true, Manager.Result.HeatmapChar.ContainsKey('H'));
-        Assert.AreEqual(true, Manager.Result.HeatmapChar.ContainsKey('e'));
-        Assert.AreEqual(true, Manager.Result.HeatmapChar.ContainsKey('l'));
-        Assert.AreEqual(true, Manager.Result.HeatmapChar.ContainsKey('o'));
-        Assert.AreEqual(2, Manager.Result.HeatmapChar['l']);
+        Assert.AreEqual(true, Manager.Result.HeatmapChar.ContainsKey("H"));
+        Assert.AreEqual(true, Manager.Result.HeatmapChar.ContainsKey("e"));
+        Assert.AreEqual(true, Manager.Result.HeatmapChar.ContainsKey("l"));
+        Assert.AreEqual(true, Manager.Result.HeatmapChar.ContainsKey("o"));
+        Assert.AreEqual(2, Manager.Result.HeatmapChar["l"]);
     }
     
 }
