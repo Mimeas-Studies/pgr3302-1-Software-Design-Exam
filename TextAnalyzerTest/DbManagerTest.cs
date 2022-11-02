@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -9,7 +10,7 @@ namespace TextAnalyzerTest;
 
 public class DbManagerTest
 {
-    private const string TestDbPath = "test/test.db";
+    private const string TestDbPath = "test.db";
     private DbManager manager;
     
     [OneTimeSetUp]
@@ -28,8 +29,6 @@ public class DbManagerTest
     [Test]
     public void SaveRetrieveTest()
     {
-        var testResult = new AnalyzerResult();
-        
         //  Explicit AnalyzerResult creation instead of using the Analyzer
         //  so the test doesn't fail by an error in AnalyzerManager
 
@@ -49,12 +48,16 @@ public class DbManagerTest
             }
         }
 
+        var testResult = new AnalyzerResult();
+        testResult.SourceName = "testData";
+        testResult.ScanTime = DateTime.Now;
         testResult.TotalWordCount = 1;
         testResult.TotalCharCount = 5;
+        testResult.LongestWord = "hello";
         testResult.HeatmapWord = wordMap;
         testResult.HeatmapChar = charMap;
         
-        manager.SaveData("testData", testResult);
+        manager.SaveData(testResult);
         var retrieved = manager.GetAllScans("testData");
         Assert.That(testResult, Is.SubsetOf(retrieved));
     }
