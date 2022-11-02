@@ -58,7 +58,7 @@ public class DbManagerTest
         testResult.HeatmapChar = charMap;
         
         manager.SaveData(testResult);
-        var retrieved = manager.GetAllScans("testData");
-        Assert.That(retrieved, Contains.Item(testResult));
+        var retrieved = manager.GetAllScans("testData")[0];
+        Assert.That(retrieved, Is.EqualTo(testResult));
     }
 }

@@ -21,14 +21,19 @@ public class AnalyzerResult {
     public string LongestWord { get; set; }
     public Dictionary<string, int> HeatmapWord { get; set; }
     public Dictionary<string, int> HeatmapChar { get; set; }
-    
 
-    public override string ToString() {
-        return "Total word count: " + TotalWordCount + ",\n" +
-               "Total char count: " + TotalCharCount + ",\n" +
-               "Longest word: " + LongestWord + ",\n" +
-               "Word Heatmap: " + ToStringHeatmap(HeatmapWord) + "\n" + 
-               "Char Heatmap:" + ToStringHeatmap(HeatmapChar) + "\n";
+
+    public override string ToString()
+    {
+        return @$"
+            Scan time: {ScanTime}
+            Source name: {SourceName}
+            Total word count: {TotalWordCount} 
+            Total char count: {TotalCharCount}
+            Longest word: {LongestWord}
+            Word Heatmap: {ToStringHeatmap(HeatmapWord)} 
+            Char Heatmap: {ToStringHeatmap(HeatmapChar)}
+        ";
     }
     
     private static string ToStringHeatmap(Dictionary<string, int> heatMap) {

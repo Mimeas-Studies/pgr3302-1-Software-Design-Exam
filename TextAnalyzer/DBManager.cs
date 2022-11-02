@@ -194,6 +194,8 @@ public class DbManager
             }
 
             var scan = new AnalyzerResult();
+            scan.ScanTime = queryReader.GetDateTime(queryReader.GetOrdinal("ScanTime"));
+            scan.SourceName = queryReader.GetString(queryReader.GetOrdinal("SourceName"));
             scan.HeatmapChar = charMap;
             scan.HeatmapWord = wordMap;
             scan.LongestWord = queryReader.GetString(queryReader.GetOrdinal("LongestWord"));
