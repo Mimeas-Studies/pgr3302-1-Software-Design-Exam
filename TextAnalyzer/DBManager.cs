@@ -43,13 +43,13 @@ public class DbManager
         command.CommandText =
             @"
                 CREATE TABLE IF NOT EXISTS Scans (
-                    'ScanId' INTEGER PRIMARY KEY autoincrement,
+                    'ScanId' INTEGER PRIMARY KEY AUTOINCREMENT,
                     'ScanTime' DATETIME,
                     'SourceName' TEXT,
                     'WordCount' INT,
                     'CharCount' INT,
                     'LongestWord' TEXT,
-                    CONSTRAINT 'UniqueTimeName' UNIQUE ('ScanTime', 'SourceName')
+                    CONSTRAINT 'ComposedPK' UNIQUE ('ScanTime', 'SourceName')
                 );
 
                 CREATE TABLE IF NOT EXISTS WordMap (
@@ -67,7 +67,7 @@ public class DbManager
         command.ExecuteNonQuery();
     }
 
-    public void SaveData(string sourceName, AnalyzerResult result)
+    public void SaveData(AnalyzerResult result)
     {
         _dbConnection.Open();
         SqliteCommand command = _dbConnection.CreateCommand();
@@ -82,22 +82,30 @@ public class DbManager
                         @CharacterCount,
                         @LongestWord
                 );
-                SELECT DISTINCT 'ScanId' FROM Scans 
-                    WHERE 
-                        'ScanTime' IS @ScanTime
-                            AND
-                        'SourceName' IS @SourceName
-                ;
+                SELECT DISTINCT 'ScanId' FROM Scans
+                WHERE 
+                    ScanTime = @ScanTime 
+                        AND
+                    SourceName = @SourceName
             ";
 
-        command.Parameters.AddWithValue("@ScanTime", DateTime.Now);
-        command.Parameters.AddWithValue("@SourceName", sourceName);
+        command.Parameters.AddWithValue("@ScanTime", result.ScanTime);
+        command.Parameters.AddWithValue("@SourceName", result.SourceName);
         command.Parameters.AddWithValue("@WordCount", result.TotalWordCount);
         command.Parameters.AddWithValue("@CharacterCount", result.TotalCharCount);
         command.Parameters.AddWithValue("@LongestWord", result.LongestWord);
         var reader = command.ExecuteReader();
-        var scanId = reader.GetInt32(reader.GetOrdinal("ScanId"));
-
+        
+        int scanId = 0;
+        if (reader.Read())
+        {
+            scanId = reader.GetInt32(reader.GetOrdinal("ScanId"));
+        }
+        else
+        {
+            throw new Exception("Failed to get ScanId");
+        }
+        
         foreach (var pair in result.HeatmapChar)
         {
             command = _dbConnection.CreateCommand();

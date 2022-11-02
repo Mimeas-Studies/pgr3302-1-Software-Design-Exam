@@ -3,7 +3,10 @@ namespace TextAnalyzer.Analyzer;
 public class AnalyzerResult {
     
     //Reason for initialise is to have zero null values and to have guard values 
-    public AnalyzerResult() {
+    public AnalyzerResult()
+    {
+        SourceName = "Not Set";
+        ScanTime = DateTime.Now;
         TotalWordCount = 0;
         TotalCharCount = 0;
         LongestWord = "";
@@ -11,6 +14,8 @@ public class AnalyzerResult {
         HeatmapChar = new Dictionary<string, int>();
     }
     
+    public string SourceName { get; set; }
+    public DateTime ScanTime { get; set; }
     public int TotalWordCount { get; set; }
     public int TotalCharCount { get; set; }
     public string LongestWord { get; set; }
