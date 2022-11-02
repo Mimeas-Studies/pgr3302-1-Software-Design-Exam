@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.IO;
+using System.Net;
 using NUnit.Framework;
 using TextAnalyzer;
 using TextAnalyzer.Analyzer;
@@ -15,6 +17,12 @@ public class DbManagerTest
         manager = new DbManager("test.db");
     }
 
+    [OneTimeTearDown]
+    public void DbTearDown()
+    {
+        // File.Delete("test.db");
+    }
+
     [Test]
     public void SaveRetrieveTest()
     {
@@ -29,9 +37,14 @@ public class DbManagerTest
         var charMap = new Dictionary<string, int>();
         foreach (var c in "hello")
         {
-            charMap.Add(
-                c.ToString(), 
-                charMap.GetValueOrDefault(c.ToString(), 0));
+            if (charMap.ContainsKey(c.ToString()))
+            {
+                charMap[c.ToString()] += 1;
+            }
+            else
+            {
+                charMap.Add(c.ToString(), 1);
+            }
         }
 
         testResult.TotalWordCount = 1;
