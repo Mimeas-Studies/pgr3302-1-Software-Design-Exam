@@ -99,7 +99,7 @@ public class DbManager
         int scanId = 0;
         if (reader.Read())
         {
-            scanId = reader.GetInt32(reader.GetOrdinal("ScanId"));
+            scanId = reader.GetInt32(0);
         }
         else
         {
