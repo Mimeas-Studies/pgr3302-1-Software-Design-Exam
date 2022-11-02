@@ -20,7 +20,7 @@ public class DbManager
         {
             exePath = ".";
         }
-        ConnectionSetup(exePath);
+        ConnectionSetup(exePath + "/analyze.db");
     }
 
     private void ConnectionSetup(string path)
@@ -28,7 +28,7 @@ public class DbManager
         string connectionString = new SqliteConnectionStringBuilder()
         {
             // Database is in same path as program directory
-            DataSource = $"{path}/analyze.db",
+            DataSource = path,
             Mode = SqliteOpenMode.ReadWriteCreate,
         }.ToString();
 
