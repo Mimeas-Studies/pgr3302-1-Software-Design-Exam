@@ -82,11 +82,12 @@ public class DbManager
                         @CharacterCount,
                         @LongestWord
                 );
-                SELECT DISTINCT 'ScanId' FROM Scans
+                SELECT DISTINCT ScanId FROM Scans
                 WHERE 
                     ScanTime = @ScanTime 
                         AND
                     SourceName = @SourceName
+                ;
             ";
 
         command.Parameters.AddWithValue("@ScanTime", result.ScanTime);
@@ -101,7 +102,7 @@ public class DbManager
         {
             scanId = reader.GetInt32(0);
         }
-        else
+        if (scanId == 0)
         {
             throw new Exception("Failed to get ScanId");
         }
@@ -123,6 +124,7 @@ public class DbManager
             command.Parameters.AddWithValue("@ScanId", scanId);
             command.Parameters.AddWithValue("@Character", pair.Key);
             command.Parameters.AddWithValue("@Count", pair.Value);
+            command.ExecuteNonQuery();
         }
         foreach (var pair in result.HeatmapWord)
         {
@@ -141,6 +143,7 @@ public class DbManager
             command.Parameters.AddWithValue("@ScanId", scanId);
             command.Parameters.AddWithValue("@Word", pair.Key);
             command.Parameters.AddWithValue("@Count", pair.Value);
+            command.ExecuteNonQuery();
         }
         _dbConnection.Close();
     }
