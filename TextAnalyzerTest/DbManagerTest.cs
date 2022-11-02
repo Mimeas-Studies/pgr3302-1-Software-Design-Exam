@@ -59,6 +59,6 @@ public class DbManagerTest
         
         manager.SaveData(testResult);
         var retrieved = manager.GetAllScans("testData");
-        Assert.That(testResult, Is.SubsetOf(retrieved));
+        Assert.That(retrieved, Contains.Item(testResult));
     }
 }
