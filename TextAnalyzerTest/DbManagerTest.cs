@@ -7,12 +7,17 @@ namespace TextAnalyzerTest;
 
 public class DbManagerTest
 {
+    private DbManager manager;
+    
+    [OneTimeSetUp]
+    public void DbSetup()
+    {
+        manager = new DbManager("test.db");
+    }
 
     [Test]
     public void SaveRetrieveTest()
     {
-        DbManager dbm = new DbManager();
-
         var testResult = new AnalyzerResult();
         
         //  Explicit AnalyzerResult creation instead of using the Analyzer
@@ -34,8 +39,8 @@ public class DbManagerTest
         testResult.HeatmapWord = wordMap;
         testResult.HeatmapChar = charMap;
         
-        dbm.SaveData("testData", testResult);
-        var retrieved = dbm.GetAllScans("testData");
+        manager.SaveData("testData", testResult);
+        var retrieved = manager.GetAllScans("testData");
         Assert.That(testResult, Is.SubsetOf(retrieved));
     }
 }
