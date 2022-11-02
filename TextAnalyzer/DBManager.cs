@@ -166,7 +166,7 @@ public class DbManager
             int scanId = queryReader.GetInt32(queryReader.GetOrdinal("ScanId"));
 
             var mapQuery = _dbConnection.CreateCommand();
-            mapQuery.CommandText = "SELECT * FROM WordMap WHERE 'ScanId' = @id";
+            mapQuery.CommandText = "SELECT * FROM WordMap WHERE ScanId = @id";
             
             mapQuery.Parameters.AddWithValue("@id", scanId);
             var mapReader = mapQuery.ExecuteReader();
@@ -181,7 +181,7 @@ public class DbManager
             }
             mapReader.Close();
             
-            mapQuery.CommandText = "SELECT * FROM CharMap WHERE 'ScanId' = @id";
+            mapQuery.CommandText = "SELECT * FROM CharMap WHERE ScanId = @id";
             mapReader = mapQuery.ExecuteReader();
             
             var charMap = new Dictionary<string, int>();
