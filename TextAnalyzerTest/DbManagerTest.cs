@@ -59,6 +59,13 @@ public class DbManagerTest
         
         manager.SaveData(testResult);
         var retrieved = manager.GetAllScans("testData")[0];
-        Assert.That(retrieved, Is.EqualTo(testResult));
+        // You forced me Nunit, this is your fault!
+        Assert.AreEqual(testResult.SourceName, retrieved.SourceName);
+        Assert.AreEqual(testResult.ScanTime, retrieved.ScanTime);
+        Assert.AreEqual(testResult.TotalWordCount, retrieved.TotalWordCount);
+        Assert.AreEqual(testResult.TotalCharCount, retrieved.TotalCharCount);
+        Assert.AreEqual(testResult.LongestWord, retrieved.LongestWord);
+        Assert.AreEqual(testResult.HeatmapWord, retrieved.HeatmapWord);
+        Assert.AreEqual(testResult.HeatmapChar, retrieved.HeatmapChar);
     }
 }
