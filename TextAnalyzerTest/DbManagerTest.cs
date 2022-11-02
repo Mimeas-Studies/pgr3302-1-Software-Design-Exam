@@ -9,18 +9,20 @@ namespace TextAnalyzerTest;
 
 public class DbManagerTest
 {
+    private const string TestDbPath = "test/test.db";
     private DbManager manager;
     
     [OneTimeSetUp]
     public void DbSetup()
     {
-        manager = new DbManager("test.db");
+        if (File.Exists(TestDbPath)) File.Delete(TestDbPath);
+        manager = new DbManager(TestDbPath);
     }
 
     [OneTimeTearDown]
     public void DbTearDown()
     {
-        // File.Delete("test.db");
+        // File.Delete(TestDbPath);
     }
 
     [Test]
