@@ -58,7 +58,8 @@ public class DbManagerTest
         testResult.HeatmapChar = charMap;
         
         manager.SaveData(testResult);
-        var retrieved = manager.GetAllScans("testData")[0];
+        var retrieved = manager.GetScan("testData", testResult.ScanTime);
+        Assert.NotNull(retrieved);
         // You forced me Nunit, this is your fault!
         Assert.AreEqual(testResult.SourceName, retrieved.SourceName);
         Assert.AreEqual(testResult.ScanTime, retrieved.ScanTime);

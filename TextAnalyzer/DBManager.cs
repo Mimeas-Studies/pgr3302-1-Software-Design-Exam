@@ -148,7 +148,31 @@ public class DbManager
         _dbConnection.Close();
     }
 
-    public List<AnalyzerResult> GetAllScans(string scanName)
+    public AnalyzerResult? GetScan(string sourceName, DateTime scanTime)
+    {
+        _dbConnection.Open();
+        var query = _dbConnection.CreateCommand();
+        query.CommandText = @"
+            SELECT * FROM Scans
+            WHERE (SourceName, ScanTime) = (@Source, @Time)
+            LIMIT 1
+        ";
+
+        query.Parameters.AddWithValue("@Source", sourceName);
+        query.Parameters.AddWithValue("@Time", scanTime);
+
+        var reader = query.ExecuteReader();
+        if (reader.Read())
+        {
+            return DeserializeScan(reader);
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public List<AnalyzerResult> GetWithSource(string scanName)
     {
         var scanList = new List<AnalyzerResult>();
         _dbConnection.Open();
@@ -163,49 +187,54 @@ public class DbManager
         var queryReader = query.ExecuteReader();
         while (queryReader.Read())
         {
-            int scanId = queryReader.GetInt32(queryReader.GetOrdinal("ScanId"));
-
-            var mapQuery = _dbConnection.CreateCommand();
-            mapQuery.CommandText = "SELECT * FROM WordMap WHERE ScanId = @id";
-            
-            mapQuery.Parameters.AddWithValue("@id", scanId);
-            var mapReader = mapQuery.ExecuteReader();
-
-            var wordMap = new Dictionary<string, int>();
-            while (mapReader.Read())
-            {
-                wordMap.Add(
-                        mapReader.GetString(mapReader.GetOrdinal("Word")),
-                        mapReader.GetInt32(mapReader.GetOrdinal("Count"))
-                    );
-            }
-            mapReader.Close();
-            
-            mapQuery.CommandText = "SELECT * FROM CharMap WHERE ScanId = @id";
-            mapReader = mapQuery.ExecuteReader();
-            
-            var charMap = new Dictionary<string, int>();
-            while (mapReader.Read())
-            {
-                charMap.Add(
-                        mapReader.GetString(mapReader.GetOrdinal("Character")),
-                        mapReader.GetInt32(mapReader.GetOrdinal("Count"))
-                    );
-            }
-
-            var scan = new AnalyzerResult();
-            scan.ScanTime = queryReader.GetDateTime(queryReader.GetOrdinal("ScanTime"));
-            scan.SourceName = queryReader.GetString(queryReader.GetOrdinal("SourceName"));
-            scan.HeatmapChar = charMap;
-            scan.HeatmapWord = wordMap;
-            scan.LongestWord = queryReader.GetString(queryReader.GetOrdinal("LongestWord"));
-            scan.TotalCharCount = queryReader.GetInt32(queryReader.GetOrdinal("CharCount"));
-            scan.TotalWordCount = queryReader.GetInt32(queryReader.GetOrdinal("WordCount"));
-            
-            scanList.Add(scan);
+            scanList.Add(DeserializeScan(queryReader));
         }
         
         _dbConnection.Close();
         return scanList;
+    }
+
+    public AnalyzerResult DeserializeScan(SqliteDataReader reader)
+    {
+        int scanId = reader.GetInt32(reader.GetOrdinal("ScanId"));
+
+        var mapQuery = _dbConnection.CreateCommand();
+        mapQuery.CommandText = "SELECT * FROM WordMap WHERE ScanId = @id";
+            
+        mapQuery.Parameters.AddWithValue("@id", scanId);
+        var mapReader = mapQuery.ExecuteReader();
+
+        var wordMap = new Dictionary<string, int>();
+        while (mapReader.Read())
+        {
+            wordMap.Add(
+                mapReader.GetString(mapReader.GetOrdinal("Word")),
+                mapReader.GetInt32(mapReader.GetOrdinal("Count"))
+            );
+        }
+        mapReader.Close();
+            
+        mapQuery.CommandText = "SELECT * FROM CharMap WHERE ScanId = @id";
+        mapReader = mapQuery.ExecuteReader();
+            
+        var charMap = new Dictionary<string, int>();
+        while (mapReader.Read())
+        {
+            charMap.Add(
+                mapReader.GetString(mapReader.GetOrdinal("Character")),
+                mapReader.GetInt32(mapReader.GetOrdinal("Count"))
+            );
+        }
+
+        var scan = new AnalyzerResult();
+        scan.ScanTime = reader.GetDateTime(reader.GetOrdinal("ScanTime"));
+        scan.SourceName = reader.GetString(reader.GetOrdinal("SourceName"));
+        scan.HeatmapChar = charMap;
+        scan.HeatmapWord = wordMap;
+        scan.LongestWord = reader.GetString(reader.GetOrdinal("LongestWord"));
+        scan.TotalCharCount = reader.GetInt32(reader.GetOrdinal("CharCount"));
+        scan.TotalWordCount = reader.GetInt32(reader.GetOrdinal("WordCount"));
+
+        return scan;
     }
 }
