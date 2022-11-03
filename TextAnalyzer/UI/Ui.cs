@@ -9,5 +9,10 @@ public class Ui
         Console.WriteLine("3. Analyze New Text");
         Console.WriteLine("4. Write your own text");
         Console.WriteLine("5. Exit");
-    }   
+    }
+
+    internal static void PrintSaveOrDiscard() {
+        Console.WriteLine("1. Save data");
+        Console.WriteLine("2. Discard data");
+    }
 }

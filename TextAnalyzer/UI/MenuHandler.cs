@@ -8,15 +8,15 @@ public class MenuHandler {
     public static void menuHandler()
     {
         Console.WriteLine("\nType in menu option number and press <Enter>");
-        var selectedMenuOption = Console.ReadKey().KeyChar;
+        var selectedMenuOption = Console.ReadLine();
         MainManager mainManager = new MainManager();
-        FileDisplayer fileDisplayer = new FileDisplayer();
+        FileManager fileManager = new FileManager();
         CreateNewFiles createNewFiles = new CreateNewFiles();
 
         switch (selectedMenuOption)
         {
-            case '1':
-                fileDisplayer.displayStoredFiles();
+            case "1":
+                fileManager.displayStoredFiles();
                 Console.WriteLine("Analyzing Text ...");
                 using (var progress = new ProgressBar())
                 {
@@ -27,21 +27,22 @@ public class MenuHandler {
                     }
                 }
                 Console.Clear();
-                mainManager.start(fileDisplayer.getSelectedFile());
-                Console.WriteLine("\n Type in (1) to save.\n Type in (2) to discard.");
-                Console.ReadLine();
+                mainManager.start(fileManager.getSelectedFile());
+                Ui.PrintSaveOrDiscard();
+                mainManager.SaveFileInDB();
+                
                 break;
-            case '2':
+            case "2":
                 break;
-            case '3':
+            case "3":
                 break;
-            case '4':
+            case "4":
                 mainManager.GenerateTxtFile();
                 Console.WriteLine("\n Type in (1) to save.\n Type in (2) to discard.");
                 Console.ReadLine();
                 break;
             
-            case '5':
+            case "5":
                 Console.WriteLine("Exiting...");
                 Program.IsProgramRunning = false; 
                 break;
