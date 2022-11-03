@@ -15,4 +15,18 @@ public class Ui
         Console.WriteLine("1. Save data");
         Console.WriteLine("2. Discard data");
     }
+
+    internal static void ProgressBar()
+    {
+        Console.WriteLine("Analyzing Text ...");
+        using (var progress = new ProgressBar())
+        {
+            for (int i = 0; i <= 100; i++)
+            {
+                progress.Report((double)i / 100);
+                Thread.Sleep(20);
+            }
+        }
+        Console.Clear();
+    }
 }
