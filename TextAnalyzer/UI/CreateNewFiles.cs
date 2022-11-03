@@ -4,7 +4,7 @@ public class CreateNewFiles
 {
     internal static void CreateTxtFiles()
     {
-        Console.WriteLine("\nEnter file name: ");
+        IOManager.Write("\nEnter file name: ");
         string fileName = Console.ReadLine();
 
         if (fileName != null)
@@ -16,9 +16,7 @@ public class CreateNewFiles
                 StreamWriter sw = new StreamWriter(
                     path
                 );
-                Console.WriteLine("Enter text: ");
-                string text = Console.ReadLine();
-                sw.WriteLine(text);
+                IOManager.Input("Enter text: ");
                 sw.Flush();
                 sw.Close();
             }
