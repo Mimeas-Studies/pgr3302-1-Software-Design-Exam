@@ -64,9 +64,10 @@ public class SqliteDb: IDbManager
                 )
             ";
         command.ExecuteNonQuery();
+        connection.Close();
     }
 
-    public AnalyzerResult DeserializeScan(SqliteDataReader reader)
+    private AnalyzerResult DeserializeScan(SqliteDataReader reader)
     {
         int scanId = reader.GetInt32(reader.GetOrdinal("ScanId"));
 
@@ -106,7 +107,7 @@ public class SqliteDb: IDbManager
         scan.LongestWord = reader.GetString(reader.GetOrdinal("LongestWord"));
         scan.TotalCharCount = reader.GetInt32(reader.GetOrdinal("CharCount"));
         scan.TotalWordCount = reader.GetInt32(reader.GetOrdinal("WordCount"));
-
+        
         return scan;
     }
 
@@ -127,12 +128,6 @@ public class SqliteDb: IDbManager
                         @CharacterCount,
                         @LongestWord
                 );
-                SELECT DISTINCT ScanId FROM Scans
-                WHERE 
-                    ScanTime = @ScanTime 
-                        AND
-                    SourceName = @SourceName
-                ;
             ";
 
         command.Parameters.AddWithValue("@ScanTime", result.ScanTime);
@@ -140,7 +135,17 @@ public class SqliteDb: IDbManager
         command.Parameters.AddWithValue("@WordCount", result.TotalWordCount);
         command.Parameters.AddWithValue("@CharacterCount", result.TotalCharCount);
         command.Parameters.AddWithValue("@LongestWord", result.LongestWord);
-        var reader = command.ExecuteReader();
+        command.ExecuteNonQuery();
+
+        var query = _dbConnection.CreateCommand();
+        query.CommandText = @"
+            SELECT ScanId FROM Scans
+            WHERE (SourceName, ScanTime) = (@Source, @Time)
+        ";
+
+        query.Parameters.AddWithValue("@Source", result.SourceName);
+        query.Parameters.AddWithValue("@Time", result.ScanTime);
+        var reader = query.ExecuteReader();
         
         int scanId = 0;
         if (reader.Read())
@@ -207,14 +212,15 @@ public class SqliteDb: IDbManager
         query.Parameters.AddWithValue("@Time", scanTime);
 
         var reader = query.ExecuteReader();
+
+        AnalyzerResult? result = null;
         if (reader.Read())
         {
-            return DeserializeScan(reader);
+            result = DeserializeScan(reader);
         }
-        else
-        {
-            return null;
-        }
+        
+        _dbConnection.Close();
+        return result;
     }
 
     public List<AnalyzerResult> GetWithSource(string scanName)
@@ -254,7 +260,7 @@ public class SqliteDb: IDbManager
         {
            scanList.Add(DeserializeScan(query)); 
         }
-
+        _dbConnection.Close();
         return scanList;
     }
     #endregion

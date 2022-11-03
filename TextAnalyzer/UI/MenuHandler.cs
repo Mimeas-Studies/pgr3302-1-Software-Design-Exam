@@ -18,12 +18,15 @@ public class MenuHandler {
             case '1':
                 fileManager.displayStoredFiles();
                 Ui.ProgressBar();
-                mainManager.start(fileManager.getSelectedFile());
-                Ui.PrintSaveOrDiscard();
-                mainManager.SaveFileInDB();
+                mainManager.Start(fileManager);
+                mainManager.SaveFileInDb();
                 break;
             
             case '2':
+                mainManager.RetriveTitlesOfAnalysedTexts();
+                Console.WriteLine("");
+                Ui.PrintBackToMainMenu();
+                selectedMenuOption = Console.ReadKey().KeyChar;
                 break;
             
             case '3':
