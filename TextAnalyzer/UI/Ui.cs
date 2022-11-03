@@ -29,4 +29,8 @@ public class Ui
         }
         Console.Clear();
     }
+
+    internal static void PrintBackToMainMenu() {
+        Console.WriteLine("1. Back to main menu");
+    }
 }
