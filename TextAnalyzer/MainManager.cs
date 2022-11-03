@@ -1,4 +1,5 @@
 ﻿using TextAnalyzer.Analyzer;
+using TextAnalyzer.UI;
 
 namespace TextAnalyzer; 
 
@@ -11,5 +12,9 @@ public class MainManager {
         Console.WriteLine(_analyzerManager.StartAnalyze().ToString());
 
 
+    }
+    public void GenerateTxtFile()
+    { 
+        CreateNewFiles.CreateTxtFiles();
     }
 }

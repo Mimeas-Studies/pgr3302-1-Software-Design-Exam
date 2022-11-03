@@ -36,8 +36,9 @@ public class MenuHandler {
             case "3":
                 break;
             case "4":
-                createNewFiles.CreateTxtFile();
-
+                mainManager.GenerateTxtFile();
+                Console.WriteLine("\n Type in (1) to save.\n Type in (2) to discard.");
+                Console.ReadLine();
                 break;
             
             case "5":
