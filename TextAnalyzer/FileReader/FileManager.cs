@@ -1,3 +1,5 @@
+using TextAnalyzer.UI;
+
 namespace TextAnalyzer;
 
 public class FileManager {
@@ -22,8 +24,8 @@ public class FileManager {
         textFileArrayList = new List<string>();
         textFileNames = new List<string>();
 
-        Console.Clear();
-        Console.WriteLine("Display texts that arent analysed.");
+        IOManager.ClearConsole();
+        IOManager.Write("Display texts that arent analysed.");
         var directoryInfo = new DirectoryInfo("Resources"); //Insert directory
         FileInfo[] files = directoryInfo.GetFiles("*.txt"); //Get files the end with .txt
         var counter = 0;
@@ -34,7 +36,7 @@ public class FileManager {
             textFileArrayList.Add(file.FullName);
         }
 
-        Console.WriteLine("\nType in menu option number and press <Enter> to analyse text");
+        IOManager.Write("\nType in menu option number and press <Enter> to analyse text");
         selectedFile = Convert.ToInt32(Console.ReadLine());
     }
 

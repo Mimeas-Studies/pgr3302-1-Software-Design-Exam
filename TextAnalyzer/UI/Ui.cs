@@ -1,4 +1,6 @@
-﻿namespace TextAnalyzer;
+﻿using TextAnalyzer.UI;
+
+namespace TextAnalyzer;
 
 public class Ui
 {
@@ -12,8 +14,8 @@ public class Ui
     }
 
     internal static void PrintSaveOrDiscard() {
-        Console.WriteLine("1. Save data");
-        Console.WriteLine("2. Discard data");
+        IOManager.Write("1. Save data");
+        IOManager.Write("2. Discard data");
     }
 
     internal static void ProgressBar()

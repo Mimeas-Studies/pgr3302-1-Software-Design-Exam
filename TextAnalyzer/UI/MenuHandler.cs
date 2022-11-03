@@ -7,7 +7,7 @@ public class MenuHandler {
     
     public static void menuHandler()
     {
-        Console.WriteLine("\nType in menu option number and press <Enter>");
+        IOManager.Write("\nType in menu option number and press <Enter>");
         var selectedMenuOption = Console.ReadKey().KeyChar;
         MainManager mainManager = new MainManager();
         FileManager fileManager = new FileManager();
@@ -24,7 +24,7 @@ public class MenuHandler {
             
             case '2':
                 mainManager.RetriveTitlesOfAnalysedTexts();
-                Console.WriteLine("");
+                IOManager.Write("");
                 Ui.PrintBackToMainMenu();
                 selectedMenuOption = Console.ReadKey().KeyChar;
                 break;
@@ -39,7 +39,7 @@ public class MenuHandler {
                 break;
             
             case '5':
-                Console.WriteLine("\nExiting...");
+                IOManager.Write("\nExiting...");
                 Program.IsProgramRunning = false; 
                 break;
         }

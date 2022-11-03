@@ -25,12 +25,12 @@ public class MainManager {
         switch (option) {
             case "1":
                 sqliteDb.SaveData(analyzerResult);
-                Console.Clear();
-                Console.WriteLine("Data stored\n");
+                IOManager.ClearConsole();
+                IOManager.Write("Data stored\n");
                 break;
             case "2":
                 Console.Clear();
-                Console.WriteLine("Data discarded\n");
+                IOManager.Write("Data discarded\n");
                 break;
             
         }
@@ -42,18 +42,18 @@ public class MainManager {
     }
 
     public void RetriveTitlesOfAnalysedTexts() {
-        Console.Clear();
-        Console.WriteLine("Names of analysed text.");
+        IOManager.ClearConsole();
+        IOManager.Write("Names of analysed text.");
         var counter = 0;
         var analyzerResultsList = sqliteDb.GetAll();
         for (var i = 0; i < analyzerResultsList.Count; i++) {
             counter++;
-            Console.WriteLine(counter+". "+analyzerResultsList[i].SourceName);
+            IOManager.Write(counter+". "+analyzerResultsList[i].SourceName);
         }
-        Console.WriteLine("\nType in menu number to see stats and press <Enter>");
+        IOManager.Write("\nType in menu number to see stats and press <Enter>");
         var selectedTxtFile = Convert.ToInt32(Console.ReadLine());
         Console.Clear();
-        Console.WriteLine("Stats of analysed text:");
+        IOManager.Write("Stats of analysed text:");
         Console.WriteLine(analyzerResultsList[selectedTxtFile - 1]);
         Console.WriteLine();
 
