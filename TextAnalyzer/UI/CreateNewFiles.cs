@@ -2,14 +2,14 @@
 
 public class CreateNewFiles
 {
-    public void CreateTxtFile()
+    internal static void CreateTxtFiles()
     {
-        Console.WriteLine("Enter file name: ");
+        Console.WriteLine("\nEnter file name: ");
         string fileName = Console.ReadLine();
 
-            if (fileName != null)
+        if (fileName != null)
         {
-            string path = Path.Combine ("Resources", fileName + ".txt");
+            string path = Path.Combine("Resources", fileName + ".txt");
 
             if (!File.Exists(path))
             {
@@ -24,5 +24,5 @@ public class CreateNewFiles
             }
         }
     }
-    }
+}
  

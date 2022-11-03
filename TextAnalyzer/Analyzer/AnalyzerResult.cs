@@ -5,7 +5,7 @@ public class AnalyzerResult {
     //Reason for initialise is to have zero null values and to have guard values 
     public AnalyzerResult()
     {
-        SourceName = "Not Set";
+        SourceName = "Not Set";//filename
         ScanTime = DateTime.Now;
         TotalWordCount = 0;
         TotalCharCount = 0;
