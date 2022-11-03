@@ -10,7 +10,7 @@ public class AnalyzerResult {
         HeatmapWord = new Dictionary<string, int>();
         HeatmapChar = new Dictionary<string, int>();
     }
-    
+
     public int TotalWordCount { get; set; }
     public int TotalCharCount { get; set; }
     public string LongestWord { get; set; }
@@ -38,5 +38,37 @@ public class AnalyzerResult {
 
         return ($" {strValue} | Counted {highestValue} times,"); 
     }
+    
+    public static AnalyzerResult operator +(AnalyzerResult a, AnalyzerResult b) {
+        var newResult = new AnalyzerResult();
 
-}
+        newResult.TotalWordCount = a.TotalWordCount + b.TotalWordCount;
+        newResult.TotalWordCount = a.TotalCharCount + b.TotalCharCount;
+
+        if (a.LongestWord.Length > b.LongestWord.Length) newResult.LongestWord = a.LongestWord;
+        else newResult.LongestWord = b.LongestWord;
+
+        newResult.HeatmapWord = b.HeatmapWord;
+        foreach (var word in a.HeatmapWord) {
+            if (newResult.HeatmapWord.ContainsKey(word.Key)) {
+                newResult.HeatmapWord[word.Key] += word.Value;
+                
+            } else {
+                newResult.HeatmapWord.Add(word.Key, word.Value);
+            }
+        }
+        
+        newResult.HeatmapChar = b.HeatmapChar;
+        foreach (var word in a.HeatmapChar) {
+            if (newResult.HeatmapChar.ContainsKey(word.Key)) {
+                newResult.HeatmapChar[word.Key] += word.Value;
+                
+            } else {
+                newResult.HeatmapChar.Add(word.Key, word.Value);
+            }
+        }
+            
+        return newResult;
+        }
+
+    }

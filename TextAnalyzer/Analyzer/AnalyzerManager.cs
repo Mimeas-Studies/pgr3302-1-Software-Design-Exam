@@ -2,69 +2,31 @@ namespace TextAnalyzer.Analyzer;
 
 public class AnalyzerManager {
     
-    public AnalyzerResult Result { get; set; }
-    private int Threads { get; set; }
-    private Queue<string> Text { get; set; }
-    private string Word { get; set; }
+    private static Queue<string> Text { get; set; } = null!;
+    private Thread[] Threads { get; }
+    private AnalyzerResult[] Results { get; }
 
-    public AnalyzerManager(Queue<string> text, int threads) {
-        Result = new AnalyzerResult();
-        Threads = threads;
+    public AnalyzerManager(Queue<string> text, int threadCount = 1) {
+        Threads = new Thread[threadCount];
+        Results = new AnalyzerResult[threadCount];
         Text = text;
-        Word = "";
     }
 
     public AnalyzerResult StartAnalyze() {
         
-        while (Text.Count > 0) {
-            Word = Text.Dequeue();
-            
-            TotalWordCount();
-            TotalCharCount();
-            CheckLongestWord();
-            HeatmapWord();
-            HeatmapChar();
+        for (int thread = 0; thread < Threads.Length; thread++) {
+            var analyzer = new AnalyzerThread(Results[thread]);
+            Threads[thread] = new Thread(analyzer.Start);
         }
 
-        return Result;
-    }
-
-
-    private void TotalWordCount() {
-        Result.TotalWordCount++;
-    }
-
-    private void TotalCharCount() {
-        var array = Word.ToCharArray();
-        Result.TotalCharCount += array.Length;
-    }
-
-    private void CheckLongestWord() {
-        if (Word.Length > Result.LongestWord.Length) {
-            Result.LongestWord += Word;
-        }
-    }
-
-    private void HeatmapWord() {
-        if (Result.HeatmapWord.ContainsKey(Word)) {
-            Result.HeatmapWord[Word]++;
+        // while (Text.Count > 0) {}
+        
+        var finishedResult = new AnalyzerResult();
+        foreach (var result in Results) {
+            finishedResult += result;
         }
         
-        else {
-            Result.HeatmapWord.Add(Word, 1);
-        }
+        return finishedResult;
     }
 
-    private void HeatmapChar() {
-        var wordArray = Word.ToCharArray();
-        foreach (var ch in wordArray) {
-            if (Result.HeatmapChar.ContainsKey(ch.ToString())) {
-                Result.HeatmapChar[ch.ToString()]++;
-            }
-            else {
-                Result.HeatmapChar.Add(ch.ToString(), 1);
-            }
-        }
-    }
-    
 }
