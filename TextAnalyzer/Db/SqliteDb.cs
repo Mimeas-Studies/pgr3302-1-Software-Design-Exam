@@ -128,12 +128,6 @@ public class SqliteDb: IDbManager
                         @CharacterCount,
                         @LongestWord
                 );
-                SELECT DISTINCT ScanId FROM Scans
-                WHERE 
-                    ScanTime = @ScanTime 
-                        AND
-                    SourceName = @SourceName
-                ;
             ";
 
         command.Parameters.AddWithValue("@ScanTime", result.ScanTime);
@@ -141,7 +135,17 @@ public class SqliteDb: IDbManager
         command.Parameters.AddWithValue("@WordCount", result.TotalWordCount);
         command.Parameters.AddWithValue("@CharacterCount", result.TotalCharCount);
         command.Parameters.AddWithValue("@LongestWord", result.LongestWord);
-        var reader = command.ExecuteReader();
+        command.ExecuteNonQuery();
+
+        var query = _dbConnection.CreateCommand();
+        query.CommandText = @"
+            SELECT ScanId FROM Scans
+            WHERE (SourceName, ScanTime) = (@Source, @Time)
+        ";
+
+        query.Parameters.AddWithValue("@Source", result.SourceName);
+        query.Parameters.AddWithValue("@Time", result.ScanTime);
+        var reader = query.ExecuteReader();
         
         int scanId = 0;
         if (reader.Read())

@@ -10,33 +10,17 @@ namespace TextAnalyzerTest;
 
 public class SqliteManagerTest
 {
-    private const string TestDbPath = "test/test.db";
+    private const string TestDbPath = "test.db";
     private IDbManager manager;
 
     [OneTimeSetUp]
-    public void CreateTestFolder()
-    {
-        var dir = Path.GetDirectoryName(TestDbPath);
-        if (dir is null) throw new Exception("Failed to get directoryname of TestDbPath");
-        else Directory.CreateDirectory(dir);
-    }
-
-    [OneTimeTearDown]
-    public void DeleteTestFolder()
-    {
-        var dir = Path.GetDirectoryName(TestDbPath);
-        if (dir is null) throw new Exception("Failed to get directoryname of TestDbPath");
-        else Directory.Delete(dir);
-    }
-    
-    [SetUp]
     public void DbSetup()
     {
         if (File.Exists(TestDbPath)) File.Delete(TestDbPath);
         manager = new SqliteDb(TestDbPath);
     }
 
-    [TearDown]
+    [OneTimeTearDown]
     public void DbTearDown()
     {
         File.Delete(TestDbPath);
@@ -65,7 +49,7 @@ public class SqliteManagerTest
         }
 
         var testResult = new AnalyzerResult();
-        testResult.SourceName = "testData";
+        testResult.SourceName = "saveRetrieveTest";
         testResult.ScanTime = DateTime.Now;
         testResult.TotalWordCount = 1;
         testResult.TotalCharCount = 5;
@@ -74,7 +58,7 @@ public class SqliteManagerTest
         testResult.HeatmapChar = charMap;
         
         manager.SaveData(testResult);
-        var retrieved = manager.GetScan("testData", testResult.ScanTime);
+        var retrieved = manager.GetScan(testResult.SourceName, testResult.ScanTime);
         Assert.NotNull(retrieved);
         // You forced me Nunit, this is your fault!
         Assert.AreEqual(testResult.SourceName, retrieved.SourceName);
@@ -92,7 +76,7 @@ public class SqliteManagerTest
         for (int i = 0; i < 10; i++)
         {
             var scan = new AnalyzerResult();
-            scan.SourceName = $"testScan{i}";
+            scan.SourceName = $"retrieveAllTest{i}";
             scan.ScanTime = DateTime.Now;
             scan.LongestWord = "hello";
             scan.TotalCharCount = 5;
@@ -111,7 +95,10 @@ public class SqliteManagerTest
         }
 
         var scanList = manager.GetAll();
-        Assert.That(scanList.Count, Is.EqualTo(10));
+        Assert.That(scanList, Is
+            .Not.Contain(null)
+            .And.Count.GreaterThanOrEqualTo(10)
+        );
     }
 
     [Test]
@@ -120,7 +107,7 @@ public class SqliteManagerTest
         for (int i = 0; i < 5; i++)
         {
             var scan = new AnalyzerResult();
-            scan.SourceName = $"testScanSource1";
+            scan.SourceName = $"GetWithSource1";
             scan.ScanTime = DateTime.Now;
             scan.LongestWord = "hello";
             scan.TotalCharCount = 5;
@@ -140,7 +127,7 @@ public class SqliteManagerTest
         for (int i = 0; i < 7; i++)
         {
             var scan = new AnalyzerResult();
-            scan.SourceName = $"testScanSource2";
+            scan.SourceName = $"GetWithSource2";
             scan.ScanTime = DateTime.Now;
             scan.LongestWord = "hello";
             scan.TotalCharCount = 5;
@@ -158,8 +145,8 @@ public class SqliteManagerTest
             manager.SaveData(scan);
         }
 
-        var scanlist1 = manager.GetWithSource("testScanSource1");
-        var scanlist2 = manager.GetWithSource("testScanSource2");
+        var scanlist1 = manager.GetWithSource("GetWithSource1");
+        var scanlist2 = manager.GetWithSource("GetWithSource2");
         
         Assert.That(scanlist1, Has.Count.EqualTo(5));
         Assert.That(scanlist2, Has.Count.EqualTo(7));
