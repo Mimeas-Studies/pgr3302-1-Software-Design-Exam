@@ -10,13 +10,13 @@ public class MenuHandler {
         Console.WriteLine("\nType in menu option number and press <Enter>");
         var selectedMenuOption = Console.ReadLine();
         MainManager mainManager = new MainManager();
-        FileDisplayer fileDisplayer = new FileDisplayer();
+        FileManager fileManager = new FileManager();
         CreateNewFiles createNewFiles = new CreateNewFiles();
 
         switch (selectedMenuOption)
         {
             case "1":
-                fileDisplayer.displayStoredFiles();
+                fileManager.displayStoredFiles();
                 Console.WriteLine("Analyzing Text ...");
                 using (var progress = new ProgressBar())
                 {
@@ -27,9 +27,10 @@ public class MenuHandler {
                     }
                 }
                 Console.Clear();
-                mainManager.start(fileDisplayer.getSelectedFile());
-                Console.WriteLine("\n Type in (1) to save.\n Type in (2) to discard.");
-                Console.ReadLine();
+                mainManager.start(fileManager.getSelectedFile());
+                Ui.PrintSaveOrDiscard();
+                mainManager.SaveFileInDB();
+                
                 break;
             case "2":
                 break;
