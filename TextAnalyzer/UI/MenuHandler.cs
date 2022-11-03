@@ -17,32 +17,25 @@ public class MenuHandler {
         {
             case '1':
                 fileManager.displayStoredFiles();
-                Console.WriteLine("Analyzing Text ...");
-                using (var progress = new ProgressBar())
-                {
-                    for (int i = 0; i <= 100; i++)
-                    {
-                        progress.Report((double)i / 100);
-                        Thread.Sleep(20);
-                    }
-                }
-                Console.Clear();
+                Ui.ProgressBar();
                 mainManager.start(fileManager.getSelectedFile());
                 mainManager.SaveFileInDB();
-                
                 break;
+            
             case '2':
                 break;
+            
             case '3':
                 break;
+            
             case '4':
                 mainManager.GenerateTxtFile();
-                Console.WriteLine("\n Type in (1) to save.\n Type in (2) to discard.");
+                Ui.PrintSaveOrDiscard();
                 Console.ReadLine();
                 break;
             
             case '5':
-                Console.WriteLine("Exiting...");
+                Console.WriteLine("\nExiting...");
                 Program.IsProgramRunning = false; 
                 break;
         }
