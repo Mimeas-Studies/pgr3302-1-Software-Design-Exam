@@ -4,7 +4,7 @@ public class CreateNewFiles
 {
     internal static void CreateTxtFiles()
     {
-        Console.WriteLine("Enter file name: ");
+        Console.WriteLine("\nEnter file name: ");
         string fileName = Console.ReadLine();
 
         if (fileName != null)
