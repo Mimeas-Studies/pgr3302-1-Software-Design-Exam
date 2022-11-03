@@ -5,29 +5,31 @@ using TextAnalyzer.UI;
 namespace TextAnalyzer; 
 
 public class MainManager {
-    private AnalyzerManager _analyzerManager;
+    private AnalyzerManager analyzerManager;
     private AnalyzerResult analyzerResult;
     private SqliteDb sqliteDb = new SqliteDb();
 
     public void start(string filename) {
         Console.WriteLine(filename);
         Queue<string> textQueue = FileManager.GetText(filename);
-        _analyzerManager = new AnalyzerManager(textQueue, 0);
-        analyzerResult = _analyzerManager.StartAnalyze();
+        analyzerManager = new AnalyzerManager(textQueue, 0);
+        analyzerResult = analyzerManager.StartAnalyze();
         Console.WriteLine();
     }
 
     public void SaveFileInDB() {
+        Console.WriteLine(analyzerResult.ToString());
+        Ui.PrintSaveOrDiscard();
         var option = Console.ReadLine();
         switch (option) {
             case "1":
-                Console.WriteLine(analyzerResult.ToString());
                 sqliteDb.SaveData(analyzerResult);
-                Console.WriteLine("Data is stored");
+                Console.Clear();
+                Console.WriteLine("Data stored\n");
                 break;
             case "2":
-                Console.WriteLine("Data discarded");
                 Console.Clear();
+                Console.WriteLine("Data discarded\n");
                 break;
             
         }

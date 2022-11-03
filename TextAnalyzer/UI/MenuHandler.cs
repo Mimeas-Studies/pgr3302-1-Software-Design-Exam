@@ -28,7 +28,6 @@ public class MenuHandler {
                 }
                 Console.Clear();
                 mainManager.start(fileManager.getSelectedFile());
-                Ui.PrintSaveOrDiscard();
                 mainManager.SaveFileInDB();
                 
                 break;
