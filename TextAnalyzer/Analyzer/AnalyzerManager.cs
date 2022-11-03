@@ -1,8 +1,8 @@
 namespace TextAnalyzer.Analyzer; 
 
 public class AnalyzerManager {
-    
-    private static Queue<string> Text { get; set; } = null!;
+
+    private static Queue<string> Text { get; set; } = new();
     private Thread[] Threads { get; }
     private AnalyzerResult[] Results { get; }
 
@@ -14,12 +14,32 @@ public class AnalyzerManager {
 
     public AnalyzerResult StartAnalyze() {
         
-        for (int thread = 0; thread < Threads.Length; thread++) {
-            var analyzer = new AnalyzerThread(Results[thread]);
-            Threads[thread] = new Thread(analyzer.Start);
+        // Parallel.For(0, Threads.Length, i => {
+        //     Results[i] = new AnalyzerResult();
+        //     var analyzer = new AnalyzerThread(Results[i], Text);
+        //     Threads[i] = new Thread(analyzer.Start);
+        //     Threads[i].Start();
+        // });
+
+        for (int i = 0; i < Threads.Length; i++) {
+            Results[i] = new AnalyzerResult();
+            var analyzer = new AnalyzerThread(Results[i], Text);
+            
+            Threads[i] = new Thread(analyzer.Start);
+            Threads[i].Start();
         }
 
-        // while (Text.Count > 0) {}
+        var isRunning = true;
+        while (isRunning) {
+            int counter = 0;
+            
+            for (int i = 0; i < Threads.Length; i++) {
+                if (!Threads[i].IsAlive) counter++;
+            }
+
+            if (counter == Threads.Length) isRunning = false;
+            else counter = 0; 
+        }
         
         var finishedResult = new AnalyzerResult();
         foreach (var result in Results) {

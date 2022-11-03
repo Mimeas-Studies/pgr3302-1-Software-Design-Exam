@@ -1,17 +1,20 @@
+using System.Text.RegularExpressions;
+
 namespace TextAnalyzer.Analyzer; 
 
 public class AnalyzerThread {
-
-    public AnalyzerResult Result { get; set; } = null!;
-    private static Queue<string> Text { get; } = null!;
+    
+    private AnalyzerResult Result { get; set; }
+    private static Queue<string> Text { get; set; } = null!;
     private string Word { get; set; } = "";
 
-    public AnalyzerThread(AnalyzerResult result) {
+    public AnalyzerThread(AnalyzerResult result, Queue<string> text) {
         Result = result;
+        Text = text;
     }
 
     public void Start() {
-        
+        Console.Write("I started");
         while (Text.Count > 0) {
             lock (Text) {
                 Word = Text.Dequeue();
@@ -37,8 +40,11 @@ public class AnalyzerThread {
     }
 
     private void CheckLongestWord() {
-        if (Word.Length > Result.LongestWord.Length) {
-            Result.LongestWord += Word;
+        var regex = new Regex("(?:[^a-z0-9 ]|(?<=['\"])s)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled);
+        var word = regex.Replace(Word, String.Empty);
+        
+        if (word.Length > Result.LongestWord.Length) {
+            Result.LongestWord = word;
         }
     }
 
