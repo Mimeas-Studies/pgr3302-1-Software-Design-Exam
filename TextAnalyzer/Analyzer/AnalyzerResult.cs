@@ -43,7 +43,7 @@ public class AnalyzerResult {
         var newResult = new AnalyzerResult();
 
         newResult.TotalWordCount = a.TotalWordCount + b.TotalWordCount;
-        newResult.TotalWordCount = a.TotalCharCount + b.TotalCharCount;
+        newResult.TotalCharCount = a.TotalCharCount + b.TotalCharCount;
 
         if (a.LongestWord.Length > b.LongestWord.Length) newResult.LongestWord = a.LongestWord;
         else newResult.LongestWord = b.LongestWord;
