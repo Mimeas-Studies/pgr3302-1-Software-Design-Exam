@@ -1,29 +1,28 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
 using NUnit.Framework;
-using TextAnalyzer;
 using TextAnalyzer.Analyzer;
+using TextAnalyzer.Db;
 
 namespace TextAnalyzerTest;
 
 public class DbManagerTest
 {
     private const string TestDbPath = "test.db";
-    private DbManager manager;
+    private IDbManager manager;
     
     [OneTimeSetUp]
     public void DbSetup()
     {
         if (File.Exists(TestDbPath)) File.Delete(TestDbPath);
-        manager = new DbManager(TestDbPath);
+        manager = new SqliteDb(TestDbPath);
     }
 
     [OneTimeTearDown]
     public void DbTearDown()
     {
-        // File.Delete(TestDbPath);
+        File.Delete(TestDbPath);
     }
 
     [Test]
