@@ -4,16 +4,35 @@ using TextAnalyzer.Analyzer;
 
 namespace TextAnalyzer.Db;
 
+/// <summary>
+/// An implementation of <see cref="IDbManager"/> for storing <see cref="AnalyzerResult"/> in an Sqlite database.
+/// </summary>
+/// <seealso cref="IDbManager"/>
 public class SqliteDb: IDbManager
 {
     private SqliteConnection _dbConnection;
 
+    /// <summary>
+    /// A new SqliteDb instance connected to a Sqlite database at the specified path.
+    /// <para>
+    /// Create a new database if it doesn't already exist.
+    /// </para>
+    /// </summary>
+    /// <param name="path">The filepath to the sqlite database.</param>
     public SqliteDb(string path)
     {
         ConnectionSetup(path);
     }
+    
+    /// <summary>
+    /// A new SqliteDb instance connected to a Sqlite database located in the executables directory.
+    /// <para>
+    /// Create a new database if it doesn't already exist.
+    /// </para>
+    /// </summary>
     public SqliteDb()
     {
+        // Path points to the directory the program is in
         string? exePath = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().Location).LocalPath);
         if (exePath is null)
         {
@@ -26,7 +45,6 @@ public class SqliteDb: IDbManager
     {
         string connectionString = new SqliteConnectionStringBuilder()
         {
-            // Database is in same path as program directory
             DataSource = path,
             Mode = SqliteOpenMode.ReadWriteCreate,
         }.ToString();
@@ -67,6 +85,11 @@ public class SqliteDb: IDbManager
         connection.Close();
     }
 
+    /// <summary>
+    /// Recreates an <see cref="AnalyzerResult"/> From the current row in the <paramref name="reader"/>.
+    /// </summary>
+    /// <param name="reader">The <see cref="SqliteDataReader"/> to extract from.</param>
+    /// <returns>The recreated <see cref="AnalyzerResult"/>.</returns>
     private AnalyzerResult DeserializeScan(SqliteDataReader reader)
     {
         int scanId = reader.GetInt32(reader.GetOrdinal("ScanId"));
