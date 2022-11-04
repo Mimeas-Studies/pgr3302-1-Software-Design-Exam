@@ -17,6 +17,7 @@ public class AnalyzerManager {
         // Parallel.For(0, Threads.Length, i => {
         //     Results[i] = new AnalyzerResult();
         //     var analyzer = new AnalyzerThread(Results[i], Text);
+        //     
         //     Threads[i] = new Thread(analyzer.Start);
         //     Threads[i].Start();
         // });
@@ -29,17 +30,23 @@ public class AnalyzerManager {
             Threads[i].Start();
         }
 
-        var isRunning = true;
-        while (isRunning) {
-            int counter = 0;
-            
-            for (int i = 0; i < Threads.Length; i++) {
-                if (!Threads[i].IsAlive) counter++;
-            }
-
-            if (counter == Threads.Length) isRunning = false;
-            else counter = 0; 
+        for (int i = 0; i < Threads.Length; i++) {
+            Threads[i].Join();
         }
+
+        // var isRunning = true;
+        // while (isRunning) {
+        //     int counter = 0;
+        //     
+        //     for (int i = 0; i < Threads.Length; i++) {
+        //         if (!Threads[i].IsAlive) counter++;
+        //     }
+        //
+        //     if (counter == Threads.Length) isRunning = false;
+        //     else {
+        //         Task.Wait(500);
+        //     } 
+        // }
         
         var finishedResult = new AnalyzerResult();
         foreach (var result in Results) {
