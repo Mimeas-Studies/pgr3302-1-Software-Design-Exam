@@ -19,6 +19,7 @@ etc.).
 
 - [ ] Initialize main program
 - [ ] Read txt.file
+- [ ] Use Code first EF Core
 
 ### Feature list
 * [ ] Coloured U/I
