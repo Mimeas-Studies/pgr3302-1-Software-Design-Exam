@@ -5,17 +5,16 @@ using TextAnalyzer.UI;
 namespace TextAnalyzer; 
 
 public class MainManager {
-    private AnalyzerManager analyzerManager;
+    private AnalyzerManager? _analyzerManager;
     private AnalyzerResult analyzerResult;
     private IDbManager dbManager = new SqliteDb();
-    private FileManager FileManager = new FileManager();
 
-    public void Start(FileManager fileManager) {
-        Queue<string> textQueue = FileManager.GetText(fileManager.getSelectedFile());
-        analyzerManager = new AnalyzerManager(textQueue, 0);
+    public void ReadAndAnalyseFile(FileManager fileManager) {
+        Queue<string> textQueue = FileManager.GetText(fileManager.GetSelectedFile());
+        _analyzerManager = new AnalyzerManager(textQueue, 0);
         
-        analyzerResult = analyzerManager.StartAnalyze();
-        analyzerResult.SourceName = fileManager.retriveAllFileNames();
+        analyzerResult = _analyzerManager.StartAnalyze();
+        analyzerResult.SourceName = fileManager.RetriveAllFileNames();
     }
 
     public void SaveFileInDb() {
@@ -32,7 +31,6 @@ public class MainManager {
                 Console.Clear();
                 IOManager.Write("Data discarded\n");
                 break;
-            
         }
 
     }

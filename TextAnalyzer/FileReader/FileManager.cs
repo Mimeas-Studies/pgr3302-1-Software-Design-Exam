@@ -3,9 +3,10 @@ using TextAnalyzer.UI;
 namespace TextAnalyzer;
 
 public class FileManager {
-    private List<string>? textFileArrayList;
-    private List<string>? textFileNames;
-    private int selectedFile;
+    private List<string>? _textFileArrayList;
+    private List<string>? _textFileNames;
+    private int _selectedFile;
+    private Boolean _notValidInput = true;
 
     //  Returns a Queue of words from a filepath
     public static Queue<string> GetText(string filepath) {
@@ -16,13 +17,12 @@ public class FileManager {
                 queue.Enqueue(word);
             }
         }
-
         return queue;
     }
 
-    internal void displayStoredFiles() {
-        textFileArrayList = new List<string>();
-        textFileNames = new List<string>();
+    internal void DisplayStoredFiles() {
+        _textFileArrayList = new List<string>();
+        _textFileNames = new List<string>();
 
         IOManager.ClearConsole();
         IOManager.Write("Display texts that arent analysed.");
@@ -32,19 +32,36 @@ public class FileManager {
         foreach (FileInfo file in files) {
             counter++;
             Console.WriteLine(counter + ". " + file.Name);
-            textFileNames.Add(file.Name);
-            textFileArrayList.Add(file.FullName);
+            _textFileNames.Add(file.Name);
+            _textFileArrayList.Add(file.FullName);
         }
 
         IOManager.Write("\nType in menu option number and press <Enter> to analyse text");
-        selectedFile = Convert.ToInt32(Console.ReadLine());
+        var inputInt = Convert.ToInt32(Console.ReadLine());
+        while (_notValidInput) {
+            if (inputInt > _textFileArrayList.Count || inputInt <= 0) {
+                Console.WriteLine("Input to high, try again:");
+                DisplayStoredFiles();
+                inputInt = Convert.ToInt32(Console.ReadLine());
+            }
+            else {
+                _notValidInput = false;
+                _selectedFile = inputInt;
+            }
+        }
+        
     }
 
-    public string getSelectedFile() {
-        return textFileArrayList[selectedFile - 1];
+    /**
+     * 
+     */
+    public string GetSelectedFile() {
+        if (_textFileArrayList != null) return _textFileArrayList[_selectedFile - 1];
+        return "No files are stored on disk";
     }
 
-    public string retriveAllFileNames() {
-        return textFileNames[selectedFile - 1];
+    public string RetriveAllFileNames() {
+        if (_textFileNames != null) return _textFileNames[_selectedFile - 1];
+        return "No files are stored on disk";
     }
 }

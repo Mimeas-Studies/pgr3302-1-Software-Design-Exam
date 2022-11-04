@@ -16,9 +16,9 @@ public class MenuHandler {
         switch (selectedMenuOption)
         {
             case '1':
-                fileManager.displayStoredFiles();
+                fileManager.DisplayStoredFiles();
                 Ui.ProgressBar();
-                mainManager.Start(fileManager);
+                mainManager.ReadAndAnalyseFile(fileManager);
                 mainManager.SaveFileInDb();
                 break;
             
@@ -26,7 +26,12 @@ public class MenuHandler {
                 mainManager.RetriveTitlesOfAnalysedTexts();
                 IOManager.Write("");
                 Ui.PrintBackToMainMenu();
-                selectedMenuOption = Console.ReadKey().KeyChar;
+                var i = Convert.ToInt32(Console.ReadLine());
+                Console.Clear();
+                if (i != 1) {
+                    Program.IsProgramRunning = false; 
+                } 
+                
                 break;
             
             case '3':
