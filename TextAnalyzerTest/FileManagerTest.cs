@@ -25,7 +25,7 @@ public class Tests {
     [Test]
     public void Analyze1500131Words()
     {
-        var manyWords = FileManager.GetText("Random Ipsum 1 500 131.txt");
+        var manyWords = FileManager.GetText("/home/snorre/Dropbox/Documents 2/Kristiania/3. Semester/PG3302-1 Software Design/_eksamen/pg3302-exam/TextAnalyzerTest/Resources/Random Ipsum 1 500 131.txt");
 
         var manager = new AnalyzerManager(manyWords, 1);
         var result = manager.StartAnalyze();

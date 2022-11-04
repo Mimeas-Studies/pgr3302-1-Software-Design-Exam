@@ -1,6 +1,9 @@
 using System.Collections.Generic;
+using System.IO;
 using NUnit.Framework;
+using TextAnalyzer;
 using TextAnalyzer.Analyzer;
+using TextAnalyzer.UI;
 
 namespace TextAnalyzerTest.Analyzer; 
 
@@ -44,6 +47,27 @@ public class AnalyzerManagerTest {
     }
     
     [Test]
+    public void ThreeWordOneThreadTest() {
+        InitializeAnalyzer("Hello world programmer!", 1);
+        var result = Manager.StartAnalyze();
+        
+        Assert.AreEqual(3, result.TotalWordCount);
+        Assert.AreEqual(21, result.TotalCharCount);
+        Assert.AreEqual("programmer", result.LongestWord);
+        
+        Assert.AreEqual(3, result.HeatmapWord.Count);
+        Assert.AreEqual(true, result.HeatmapWord.ContainsKey("world"));
+        Assert.AreEqual(1, result.HeatmapWord["world"]);
+        
+        Assert.AreEqual(12, result.HeatmapChar.Count);
+        Assert.AreEqual(true, result.HeatmapChar.ContainsKey("H"));
+        Assert.AreEqual(true, result.HeatmapChar.ContainsKey("w"));
+        Assert.AreEqual(true, result.HeatmapChar.ContainsKey("l"));
+        Assert.AreEqual(true, result.HeatmapChar.ContainsKey("p"));
+        Assert.AreEqual(3, result.HeatmapChar["l"]);
+    }
+    
+    [Test]
     public void OneWordTwoThreadTest() {
         InitializeAnalyzer("Hello", 2);
         var result = Manager.StartAnalyze();
@@ -63,10 +87,10 @@ public class AnalyzerManagerTest {
         Assert.AreEqual(true, result.HeatmapChar.ContainsKey("o"));
         Assert.AreEqual(2, result.HeatmapChar["l"]);
     }
-    
+
     [Test]
-    public void ThreeWordOneThreadTest() {
-        InitializeAnalyzer("Hello world programmer!", 1);
+    public void ThreeWordTwoThreadTest() {
+        InitializeAnalyzer("Hello world programmer!", 2);
         var result = Manager.StartAnalyze();
         
         Assert.AreEqual(3, result.TotalWordCount);
@@ -83,6 +107,17 @@ public class AnalyzerManagerTest {
         Assert.AreEqual(true, result.HeatmapChar.ContainsKey("l"));
         Assert.AreEqual(true, result.HeatmapChar.ContainsKey("p"));
         Assert.AreEqual(3, result.HeatmapChar["l"]);
+    }
+    
+    [Test]
+    public void Funtest() {
+
+        var qeuee = FileManager.GetText(
+            "/home/snorre/Dropbox/Documents 2/Kristiania/3. Semester/PG3302-1 Software Design/_eksamen/pg3302-exam/TextAnalyzerTest/Resources/Lorem Ipsum 500.txt");
+        var test = new AnalyzerManager(qeuee, 1);
+        var something = test.StartAnalyze();
+        
+        Assert.AreEqual(500, something.TotalWordCount);
     }
     
 }

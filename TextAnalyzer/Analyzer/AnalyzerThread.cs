@@ -7,6 +7,7 @@ public class AnalyzerThread {
     private AnalyzerResult Result { get; set; }
     private static Queue<string> Text { get; set; } = null!;
     private string Word { get; set; } = "";
+    private int Count { get; set; }
 
     public AnalyzerThread(AnalyzerResult result, Queue<string> text) {
         Result = result;
@@ -14,17 +15,23 @@ public class AnalyzerThread {
     }
 
     public void Start() {
-        Console.Write("I started");
-        while (Text.Count > 0) {
-            lock (Text) {
+
+        lockCheck:
+        lock (Text) {
+            Count = Text.Count;
+            if (Count > 0) {
                 Word = Text.Dequeue();
             }
-
+        }
+        
+        if (Count > 0) {
+            // Console.WriteLine(Count);
             TotalWordCount();
             TotalCharCount();
             CheckLongestWord();
             HeatmapWord();
             HeatmapChar();
+            goto lockCheck;
         }
 
     }
