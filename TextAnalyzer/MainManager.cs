@@ -7,7 +7,7 @@ namespace TextAnalyzer;
 public class MainManager {
     private AnalyzerManager analyzerManager;
     private AnalyzerResult analyzerResult;
-    private SqliteDb sqliteDb = new SqliteDb();
+    private IDbManager dbManager = new SqliteDb();
     private FileManager FileManager = new FileManager();
 
     public void Start(FileManager fileManager) {
@@ -24,7 +24,7 @@ public class MainManager {
         var option = Console.ReadLine();
         switch (option) {
             case "1":
-                sqliteDb.SaveData(analyzerResult);
+                dbManager.SaveData(analyzerResult);
                 IOManager.ClearConsole();
                 IOManager.Write("Data stored\n");
                 break;
@@ -45,7 +45,7 @@ public class MainManager {
         IOManager.ClearConsole();
         IOManager.Write("Names of analysed text.");
         var counter = 0;
-        var analyzerResultsList = sqliteDb.GetAll();
+        var analyzerResultsList = dbManager.GetAll();
         for (var i = 0; i < analyzerResultsList.Count; i++) {
             counter++;
             IOManager.Write(counter+". "+analyzerResultsList[i].SourceName);
