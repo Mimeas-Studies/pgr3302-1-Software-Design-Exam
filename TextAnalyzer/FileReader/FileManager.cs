@@ -2,13 +2,20 @@ using TextAnalyzer.UI;
 
 namespace TextAnalyzer;
 
+/// <summary>
+/// Handles txt files by storing them in Queue's, displays them from directories and return them
+/// </summary>
 public class FileManager {
     private List<string>? _textFileArrayList;
     private List<string>? _textFileNames;
     private int _selectedFile;
-    private Boolean _notValidInput = true;
-
-    //  Returns a Queue of words from a filepath
+    private Boolean _notValidInput;
+    
+    /// <summary>
+    /// Reads .txt files and adds strings separated by an empty space to a queue.
+    /// </summary>
+    /// <param name="filepath">takes in a file from  bin/debug/net6.0/resources</param>
+    /// <returns>a list of strings in a queue</returns>
     public static Queue<string> GetText(string filepath) {
         var queue = new Queue<string>();
 
@@ -20,7 +27,12 @@ public class FileManager {
         return queue;
     }
 
+    /// <summary>
+    /// Displays files that are located in the resources directory
+    /// checks in user input is valid based on files from directory
+    /// </summary>
     internal void DisplayStoredFiles() {
+        _notValidInput = true;
         _textFileArrayList = new List<string>();
         _textFileNames = new List<string>();
 
@@ -37,29 +49,37 @@ public class FileManager {
         }
 
         IOManager.Write("\nType in menu option number and press <Enter> to analyse text");
+        
         var inputInt = Convert.ToInt32(Console.ReadLine());
         while (_notValidInput) {
             if (inputInt > _textFileArrayList.Count || inputInt <= 0) {
                 Console.WriteLine("Input to high, try again:");
-                DisplayStoredFiles();
                 inputInt = Convert.ToInt32(Console.ReadLine());
             }
             else {
                 _notValidInput = false;
-                _selectedFile = inputInt;
+                Console.Clear();
             }
+            _selectedFile = inputInt;
+            
         }
         
     }
 
-    /**
-     * 
-     */
+    /// <summary>
+    /// Checks if there are existing files added previously
+    /// </summary>
+    /// <returns> returns selected file path with user input </returns>
     public string GetSelectedFile() {
         if (_textFileArrayList != null) return _textFileArrayList[_selectedFile - 1];
         return "No files are stored on disk";
     }
 
+    
+    /// <summary>
+    /// Checks if there are existing file names added previously
+    /// </summary>
+    /// <returns> returns selected file name with user input </returns>
     public string RetriveAllFileNames() {
         if (_textFileNames != null) return _textFileNames[_selectedFile - 1];
         return "No files are stored on disk";

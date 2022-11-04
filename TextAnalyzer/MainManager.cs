@@ -24,7 +24,7 @@ public class MainManager {
         switch (option) {
             case "1":
                 dbManager.SaveData(analyzerResult);
-                IOManager.ClearConsole();
+                Console.Clear();
                 IOManager.Write("Data stored\n");
                 break;
             case "2":
