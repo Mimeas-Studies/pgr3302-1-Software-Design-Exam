@@ -8,30 +8,44 @@ public class AnalyzerThread {
     private static Queue<string> Text { get; set; } = null!;
     private string Word { get; set; } = "";
     private int Count { get; set; }
+    
+    private static Regex _regex = new Regex("(?:[^a-z0-9 ]|(?<=['\"])s)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled);
+
 
     public AnalyzerThread(AnalyzerResult result, Queue<string> text) {
         Result = result;
         Text = text;
     }
 
-    public void Start() {
-
-        lockCheck:
-        lock (Text) {
-            Count = Text.Count;
-            if (Count > 0) {
+    private bool GetNextWord()
+    {
+        bool hasMore = false;
+        lock (Text)
+        {
+            if (Text.Count > 0)
+            {
                 Word = Text.Dequeue();
+                hasMore = true;
             }
         }
-        
-        if (Count > 0) {
-            // Console.WriteLine(Count);
+
+        return hasMore;
+    }
+
+    public void Start()
+    {
+
+        bool hasMore = GetNextWord();
+        while(hasMore)
+        {
             TotalWordCount();
             TotalCharCount();
             CheckLongestWord();
             HeatmapWord();
             HeatmapChar();
-            goto lockCheck;
+
+            // Get next word
+            hasMore = GetNextWord();
         }
 
     }
@@ -47,8 +61,7 @@ public class AnalyzerThread {
     }
 
     private void CheckLongestWord() {
-        var regex = new Regex("(?:[^a-z0-9 ]|(?<=['\"])s)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled);
-        var word = regex.Replace(Word, String.Empty);
+        var word = _regex.Replace(Word, String.Empty);
         
         if (word.Length > Result.LongestWord.Length) {
             Result.LongestWord = word;

@@ -113,7 +113,7 @@ public class AnalyzerManagerTest {
     public void Funtest() {
 
         var qeuee = FileManager.GetText(
-            "/home/snorre/Dropbox/Documents 2/Kristiania/3. Semester/PG3302-1 Software Design/_eksamen/pg3302-exam/TextAnalyzerTest/Resources/Lorem Ipsum 500.txt");
+            "Resources/Lorem Ipsum 500.txt");
         var test = new AnalyzerManager(qeuee, 1);
         var something = test.StartAnalyze();
         
