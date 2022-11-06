@@ -8,6 +8,9 @@ public class AnalyzerThread {
     private static Queue<string> Text { get; set; } = null!;
     private string Word { get; set; } = "";
     private int Count { get; set; }
+    
+    private static Regex _regex = new Regex("(?:[^a-z0-9 ]|(?<=['\"])s)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled);
+
 
     public AnalyzerThread(AnalyzerResult result, Queue<string> text) {
         Result = result;
@@ -58,8 +61,7 @@ public class AnalyzerThread {
     }
 
     private void CheckLongestWord() {
-        var regex = new Regex("(?:[^a-z0-9 ]|(?<=['\"])s)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled);
-        var word = regex.Replace(Word, String.Empty);
+        var word = _regex.Replace(Word, String.Empty);
         
         if (word.Length > Result.LongestWord.Length) {
             Result.LongestWord = word;
