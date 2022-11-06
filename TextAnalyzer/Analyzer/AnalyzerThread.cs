@@ -5,11 +5,12 @@ namespace TextAnalyzer.Analyzer;
 public class AnalyzerThread {
     
     private AnalyzerResult Result { get; set; }
-    private static Queue<string> Text { get; set; } = null!;
+    private Queue<string> Text { get; set; }
     private string Word { get; set; } = "";
     private int Count { get; set; }
     
     private static Regex _regex = new Regex("(?:[^a-z0-9 ]|(?<=['\"])s)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled);
+    private readonly IEnumerator<string> _textStream;
 
 
     public AnalyzerThread(AnalyzerResult result, Queue<string> text) {
@@ -17,15 +18,31 @@ public class AnalyzerThread {
         Text = text;
     }
 
+    public AnalyzerThread(AnalyzerResult result, IEnumerator<string> textStream)
+    {
+        Result = result;
+        Text = new Queue<string>();
+        _textStream = textStream;
+    }
+
     private bool GetNextWord()
     {
+        get_word:
         bool hasMore = false;
-        lock (Text)
+        if (Text.Count > 0)
         {
-            if (Text.Count > 0)
+            Word = Text.Dequeue();
+            hasMore = true;
+        }
+        else {
+            lock (_textStream)
             {
-                Word = Text.Dequeue();
-                hasMore = true;
+                if (_textStream.MoveNext())
+                {
+                    string line = _textStream.Current;
+                    Text = new Queue<string>(line.Split(" "));
+                    goto get_word;
+                }
             }
         }
 
