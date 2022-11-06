@@ -14,24 +14,35 @@ public class AnalyzerThread {
         Text = text;
     }
 
-    public void Start() {
-
-        lockCheck:
-        lock (Text) {
-            Count = Text.Count;
-            if (Count > 0) {
+    private bool GetNextWord()
+    {
+        bool hasMore = false;
+        lock (Text)
+        {
+            if (Text.Count > 0)
+            {
                 Word = Text.Dequeue();
+                hasMore = true;
             }
         }
-        
-        if (Count > 0) {
-            // Console.WriteLine(Count);
+
+        return hasMore;
+    }
+
+    public void Start()
+    {
+
+        bool hasMore = GetNextWord();
+        while(hasMore)
+        {
             TotalWordCount();
             TotalCharCount();
             CheckLongestWord();
             HeatmapWord();
             HeatmapChar();
-            goto lockCheck;
+
+            // Get next word
+            hasMore = GetNextWord();
         }
 
     }
