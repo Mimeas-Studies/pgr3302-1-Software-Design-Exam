@@ -1,7 +1,6 @@
 @startuml
 class Program {
     - IsProgramRunning: bool
-    
     + Main(args: String[]): void
 }
 
@@ -90,16 +89,14 @@ class SqliteDb {
     - DeserializeScan(reader: SqliteDataReader): AnalyzerResult
 }
 
-Program <--> MenuHandler
+Program --> MenuHandler
 Program -> Ui
 MenuHandler -> Ui
 MenuHandler --> MainManager
 MenuHandler --> CreateNewFiles
-MenuHandler --> FileManager
+FileManager -> MenuHandler
 CreateNewFiles --> IOManager
-MainManager --> AnalyzerManager
+AnalyzerManager <- MainManager
 MainManager --> IDbManager
-AnalyzerManager --> AnalyzerResult
 IDbManager o-- SqliteDb
-IDbManager --> AnalyzerResult
 @enduml
