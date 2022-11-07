@@ -1,0 +1,96 @@
+@startuml
+'https://plantuml.com/
+
+'------interfaces & abstracts-------
+
+interface ISourceLoader {
+    ..Methods..
+    GetTextIterator(path: string): IEnumerator<string>
+    GetAvailableTexts(): List<string>
+}
+
+interface StoreManager {
+    + SaveResult(result: AnalyzerResult): void
+    + GetScanList(): List<(string, DateTime)>
+    + GetScan(sourceName: string, scanTime: DateTime): AnalyzerResult?
+    + GetAll(): List<AnalyzerResult>
+    + GetWithSource(name: string): List<AnalyzerResult>
+}
+
+'-----------classes-----------------
+
+class MainManager {
+    ..Methods..
+    + Main(args: string[]): void
+    - NewScan(): AnalyzerResult
+    - SaveResult(scan: AnalyzerResult): void
+    - DeleteResult(result): void
+    - GetSavedScans(): List<AnalyzerResult>
+}
+
+class UiManager {
+    ..Fields..
+    - stdout
+    ..Methods..
+    + GetAction(actions): Action
+    + GetInput(message: string): Input
+    + Display(message: string): void
+
+}
+
+class SourceManager {
+    ..Fields..
+    - SourceList: Dictionary<string, ISourceLoader>
+    ..Methods..
+    + GetText(source: string): IEnumerator<string>
+    + GetAvailableSources(): List<string> 
+}
+
+class AnalyzerManager {
+    ..Fields..
+    - threads: int
+    ..Methods..
+    + AnalyzeSource(source: IEnumerator<string>): AnalyzerResult
+}
+
+class AnalyzerThread {
+    ..Fields..
+    - source: IEnumerator<string>
+    - loadedText: Queue<string>
+    ..Methods..
+    + Start(source: IEnumerator<string>)): AnalyzerResult
+    - GetNextLine(): void
+    - TotalWordCount(): void
+    - TotalCharCount(): void
+    - LongestWord(): void
+    - WordHeatMap(): void
+    - CharHeatMap(): void
+}
+
+class SqliteDb {
+    ..Fields..
+    - dbConnection: SqliteConnection
+    ..Methods..
+    + SqliteDb(): SqliteDb
+    + SqliteDb(path: string) SqliteDb
+    - ConnectionSetup(path: string): void
+    - TableSetup(): void
+    - DeserializeScan(reader: SqliteReader): AnalyzerResult
+}
+
+'-----------Relations------------
+
+UiManager <-- MainManager
+UiManager --> SourceManager
+UiManager --> StoreManager
+
+SourceManager <- MainManager
+ISourceLoader <- SourceManager
+
+MainManager --> AnalyzerManager
+AnalyzerManager --> AnalyzerThread
+
+MainManager -> StoreManager
+StoreManager o- SqliteDb
+
+@enduml
