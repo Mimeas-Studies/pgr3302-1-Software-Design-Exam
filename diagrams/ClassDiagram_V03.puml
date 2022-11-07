@@ -9,7 +9,7 @@ interface ISourceLoader {
     GetAvailableTexts(): List<string>
 }
 
-interface StoreManager {
+interface IStoreManager {
     + SaveResult(result: AnalyzerResult): void
     + GetScanList(): List<(string, DateTime)>
     + GetScan(sourceName: string, scanTime: DateTime): AnalyzerResult?
@@ -19,7 +19,24 @@ interface StoreManager {
 
 '-----------classes-----------------
 
+class AnalyzerResult {
+    ..Fields..
+    + SourceName: string
+    + ScanTime: DateTime
+    + TotalWordCount: int
+    + TotalCharCount: int
+    + LongestWord: string
+    + WordHeatMap: Dictionary<string,int>
+    + CharHeatMap: Dictionary<string,int>
+    ..Methods..
+    + ToString(): string
+}
+
 class MainManager {
+    ..Fields..
+    - sourceManager: SourceManager
+    - analyzerManager: AnalyzerManager
+    - storage: IStoreManager
     ..Methods..
     + Main(args: string[]): void
     - NewScan(): AnalyzerResult
@@ -28,14 +45,16 @@ class MainManager {
     - GetSavedScans(): List<AnalyzerResult>
 }
 
-class UiManager {
-    ..Fields..
-    - stdout
-    ..Methods..
-    + GetAction(actions): Action
+class Ui {
     + GetInput(message: string): Input
     + Display(message: string): void
+}
 
+class UiManager {
+    ..Methods..
+    + GetAction(alternatives: List<string>): int
+    + ShowResult(result: AnalyzerResult): void
+    + ShowResultList(list: List<Result>): void
 }
 
 class SourceManager {
@@ -82,7 +101,9 @@ class SqliteDb {
 
 UiManager <-- MainManager
 UiManager --> SourceManager
-UiManager --> StoreManager
+UiManager --> IStoreManager
+
+Ui <-- UiManager
 
 SourceManager <- MainManager
 ISourceLoader <- SourceManager
@@ -90,7 +111,7 @@ ISourceLoader <- SourceManager
 MainManager --> AnalyzerManager
 AnalyzerManager --> AnalyzerThread
 
-MainManager -> StoreManager
-StoreManager o- SqliteDb
+MainManager -> IStoreManager
+IStoreManager o- SqliteDb
 
 @enduml
