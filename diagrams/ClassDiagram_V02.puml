@@ -94,7 +94,7 @@ Program -> Ui
 MenuHandler -> Ui
 MenuHandler --> MainManager
 MenuHandler --> CreateNewFiles
-FileManager -> MenuHandler
+FileManager <- MenuHandler
 CreateNewFiles --> IOManager
 AnalyzerManager <- MainManager
 MainManager --> IDbManager
