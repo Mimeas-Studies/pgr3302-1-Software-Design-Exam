@@ -8,12 +8,6 @@ public class AnalyzerManager {
 
     private IEnumerator<string> _textStream;
 
-    public AnalyzerManager(Queue<string> text, int threadCount = 1) {
-        Threads = new Thread[threadCount];
-        Results = new AnalyzerResult[threadCount];
-        Text = text;
-    }
-
     public AnalyzerManager(IEnumerator<string> textStream, int threadCount = 1)
     {
         Threads = new Thread[threadCount];

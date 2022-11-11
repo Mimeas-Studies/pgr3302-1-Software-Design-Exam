@@ -114,8 +114,8 @@ public class AnalyzerManagerTest {
     public void Funtest()
     {
 
-        var textFile = File.ReadLines("Resources/generated.txt");
-        var test = new AnalyzerManager(textFile.GetEnumerator(), 4);
+        var textFile = FileManager.GetText("Resources/generated.txt");
+        var test = new AnalyzerManager(textFile, 4);
         var something = test.StartAnalyze();
         
         Console.WriteLine("analyzed " + something.TotalWordCount + " words");
