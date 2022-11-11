@@ -37,12 +37,10 @@ public class AnalyzerThread {
         else {
             lock (_textStream)
             {
-                if (_textStream.MoveNext())
-                {
-                    string line = _textStream.Current;
-                    Text = new Queue<string>(line.Split(" "));
-                    goto get_word;
-                }
+                if (!_textStream.MoveNext()) return hasMore;
+                string line = _textStream.Current;
+                Text = new Queue<string>(line.Split(" "));
+                goto get_word;
             }
         }
 
