@@ -16,7 +16,7 @@ public class MainManager {
 
     public void ReadAndAnalyseFile(FileManager fileManager) {
         IEnumerator<string> textStream = FileManager.GetText(fileManager.GetSelectedFile());
-        _analyzerManager = new AnalyzerManager(textStream, 0);
+        _analyzerManager = new AnalyzerManager(textStream, 1);
         
         _analyzerResult = _analyzerManager.StartAnalyze();
         _analyzerResult.SourceName = fileManager.RetriveAllFileNames();
