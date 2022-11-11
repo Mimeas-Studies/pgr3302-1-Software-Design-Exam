@@ -14,13 +14,9 @@ public class MainManager {
     private readonly IDbManager? _dbManager = new SqliteDb();
     internal static bool IsProgramRunning = true;
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="fileManager"></param>
-    private void ReadAndAnalyseFile(FileManager fileManager) {
-        Queue<string> textQueue = FileManager.GetText(fileManager.GetSelectedFile());
-        _analyzerManager = new AnalyzerManager(textQueue, 0);
+    public void ReadAndAnalyseFile(FileManager fileManager) {
+        IEnumerator<string> textStream = FileManager.GetText(fileManager.GetSelectedFile());
+        _analyzerManager = new AnalyzerManager(textStream, 1);
         
         _analyzerResult = _analyzerManager.StartAnalyze();
         _analyzerResult.SourceName = fileManager.RetriveAllFileNames();
