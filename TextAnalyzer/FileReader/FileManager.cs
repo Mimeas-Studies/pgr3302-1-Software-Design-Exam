@@ -9,22 +9,16 @@ public class FileManager {
     private List<string>? _textFileArrayList;
     private List<string>? _textFileNames;
     private int _selectedFile;
-    private Boolean _notValidInput;
+    private bool _notValidInput;
     
     /// <summary>
     /// Reads .txt files and adds strings separated by an empty space to a queue.
     /// </summary>
     /// <param name="filepath">takes in a file from  bin/debug/net6.0/resources</param>
     /// <returns>a list of strings in a queue</returns>
-    public static Queue<string> GetText(string filepath) {
-        var queue = new Queue<string>();
-
-        foreach (string line in File.ReadLines(filepath)) {
-            foreach (var word in line.Split(" ")) {
-                queue.Enqueue(word);
-            }
-        }
-        return queue;
+    public static IEnumerator<string> GetText(string filepath) {
+        IEnumerable<string> text = File.ReadLines(filepath);
+        return text.GetEnumerator();
     }
 
     /// <summary>
@@ -61,9 +55,7 @@ public class FileManager {
                 Console.Clear();
             }
             _selectedFile = inputInt;
-            
         }
-        
     }
 
     /// <summary>

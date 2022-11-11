@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using NUnit.Framework;
@@ -110,14 +111,14 @@ public class AnalyzerManagerTest {
     }
     
     [Test]
-    public void Funtest() {
+    public void Funtest()
+    {
 
-        var qeuee = FileManager.GetText(
-            "Resources/Lorem Ipsum 500.txt");
-        var test = new AnalyzerManager(qeuee, 1);
+        var textFile = FileManager.GetText("Resources/generated.txt");
+        var test = new AnalyzerManager(textFile, 4);
         var something = test.StartAnalyze();
         
-        Assert.AreEqual(500, something.TotalWordCount);
+        Console.WriteLine("analyzed " + something.TotalWordCount + " words");
     }
     
 }

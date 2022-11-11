@@ -10,8 +10,8 @@ public class MainManager {
     private IDbManager dbManager = new SqliteDb();
 
     public void ReadAndAnalyseFile(FileManager fileManager) {
-        Queue<string> textQueue = FileManager.GetText(fileManager.GetSelectedFile());
-        _analyzerManager = new AnalyzerManager(textQueue, 0);
+        IEnumerator<string> text = FileManager.GetText(fileManager.GetSelectedFile());
+        _analyzerManager = new AnalyzerManager(text, 0);
         
         analyzerResult = _analyzerManager.StartAnalyze();
         analyzerResult.SourceName = fileManager.RetriveAllFileNames();

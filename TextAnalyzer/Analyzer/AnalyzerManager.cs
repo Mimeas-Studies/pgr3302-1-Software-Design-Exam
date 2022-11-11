@@ -6,10 +6,13 @@ public class AnalyzerManager {
     private Thread[] Threads { get; }
     private AnalyzerResult[] Results { get; }
 
-    public AnalyzerManager(Queue<string> text, int threadCount = 1) {
+    private IEnumerator<string> _textStream;
+
+    public AnalyzerManager(IEnumerator<string> textStream, int threadCount = 1)
+    {
         Threads = new Thread[threadCount];
         Results = new AnalyzerResult[threadCount];
-        Text = text;
+        _textStream = textStream;
     }
 
     public AnalyzerResult StartAnalyze() {
@@ -24,7 +27,7 @@ public class AnalyzerManager {
 
         for (int i = 0; i < Threads.Length; i++) {
             Results[i] = new AnalyzerResult();
-            var analyzer = new AnalyzerThread(Results[i], Text);
+            var analyzer = new AnalyzerThread(Results[i], _textStream);
             
             Threads[i] = new Thread(analyzer.Start);
             Threads[i].Start();
