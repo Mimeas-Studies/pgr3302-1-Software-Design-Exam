@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using NUnit.Framework;
 using TextAnalyzer;
 using TextAnalyzer.Analyzer;
-using TextAnalyzer.UI;
 
 namespace TextAnalyzerTest.Analyzer; 
 
@@ -14,7 +12,7 @@ public class AnalyzerManagerTest {
 
     private void InitializeAnalyzer(string text, int threads) {
         Queue<string> queue = MakeQueue(text);
-        Manager = new AnalyzerManager(queue, threads);
+        Manager = new AnalyzerManager(queue.GetEnumerator(), threads);
     }
 
     private Queue<string> MakeQueue(string text) {

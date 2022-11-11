@@ -9,17 +9,29 @@ public class Tests {
     [Test]
     public void ShouldRead500Words()
     {
-        var words = FileManager.GetText("Resources/Lorem Ipsum 500.txt");
+        var lines = FileManager.GetText("Resources/Lorem Ipsum 500.txt");
+
+        int count = 0;
+        while (lines.MoveNext())
+        {
+            count += lines.Current.Split(" ").Length;
+        }
         
-        Assert.That(words.Count, Is.EqualTo(500));
+        Assert.That(count, Is.EqualTo(500));
     }
 
     [Test]
     public void ShouldReadLargeFile()
     {
-        var manyWords = FileManager.GetText("Resources/Random Ipsum 1 500 131.txt");
+        var lines = FileManager.GetText("Resources/Random Ipsum 1 500 131.txt");
         
-        Assert.That(manyWords.Count, Is.EqualTo(1_500_131));
+        int count = 0;
+        while (lines.MoveNext())
+        {
+            count += lines.Current.Split(" ").Length;
+        }
+        
+        Assert.That(count, Is.EqualTo(1_500_131));
     }
 
     [Test]

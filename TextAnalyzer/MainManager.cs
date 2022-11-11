@@ -15,8 +15,8 @@ public class MainManager {
     internal static bool IsProgramRunning = true;
 
     public void ReadAndAnalyseFile(FileManager fileManager) {
-        Queue<string> textQueue = FileManager.GetText(fileManager.GetSelectedFile());
-        _analyzerManager = new AnalyzerManager(textQueue, 0);
+        IEnumerator<string> textStream = FileManager.GetText(fileManager.GetSelectedFile());
+        _analyzerManager = new AnalyzerManager(textStream, 0);
         
         _analyzerResult = _analyzerManager.StartAnalyze();
         _analyzerResult.SourceName = fileManager.RetriveAllFileNames();
