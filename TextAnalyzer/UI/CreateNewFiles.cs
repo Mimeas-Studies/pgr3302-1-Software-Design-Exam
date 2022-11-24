@@ -1,30 +1,33 @@
 ﻿namespace TextAnalyzer.UI;
 
-public class CreateNewFiles {
-    internal static void CreateTxtFiles() {
+public class CreateNewFiles
+{
+    internal static void CreateTxtFiles()
+    {
         IOManager.ClearConsole();
         IOManager.Write("\nEnter file name: ");
         string fileName = Console.ReadLine();
-      
-        
-        if (fileName != null) {
-            
+
+
+        if (fileName != null)
+        {
             string path = Path.Combine("Resources", fileName + ".txt");
-            
-            if (!File.Exists(path)) {
+
+            if (!File.Exists(path))
+            {
                 StreamWriter sw = new StreamWriter(
                     path
                 );
-                
+
                 sw.Write(IOManager.Input("Enter text: "));
                 sw.Flush();
                 sw.Close();
                 Ui.PrintSaveOrDiscard();
-                if (IOManager.Input() == "2") {
+                if (IOManager.Input() == "2")
+                {
                     File.Delete(path);
-                } 
+                }
             }
         }
     }
 }
- 

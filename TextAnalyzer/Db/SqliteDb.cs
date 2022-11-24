@@ -12,7 +12,7 @@ namespace TextAnalyzer.Db;
 /// <seealso cref="IDbManager"/>
 public class SqliteDb : IDbManager
 {
-    private SqliteConnection _dbConnection;
+    private readonly SqliteConnection _dbConnection;
 
     /// <summary>
     /// A new SqliteDb instance connected to a Sqlite database at the specified path.
@@ -39,8 +39,8 @@ public class SqliteDb : IDbManager
         string dbPath = exeDir + "/analyze.db";
 
         _dbConnection = ConnectionSetup(dbPath);
-        
-        
+
+
         SqliteDb.TableSetup(_dbConnection);
     }
 
@@ -58,20 +58,20 @@ public class SqliteDb : IDbManager
         if (!File.Exists(path)) Logger.Warn("Database file does not exist, creating a new one");
 
         SqliteConnection connection = new SqliteConnection(connectionString);
-        
+
         // test connection
-        connection.Open(); 
+        connection.Open();
         if (connection.State != ConnectionState.Open) Logger.Warn("Database does not connect");
         else Logger.Info("Database connected");
         connection.Close();
-        
+
         return connection;
     }
 
     private static void TableSetup(SqliteConnection connection)
     {
         Logger.Debug("Setting up Database tables");
-        
+
         SqliteCommand command = connection.CreateCommand();
         command.CommandText =
             @"

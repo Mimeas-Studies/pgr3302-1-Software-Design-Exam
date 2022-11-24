@@ -2,11 +2,10 @@ namespace TextAnalyzer.Analyzer;
 
 public class AnalyzerManager
 {
-    private static Queue<string> Text { get; set; } = new();
     private Thread[] Threads { get; }
     private AnalyzerResult[] Results { get; }
 
-    private IEnumerator<string> _textStream;
+    private readonly IEnumerator<string> _textStream;
 
     public AnalyzerManager(IEnumerator<string> textStream, int threadCount = 1)
     {
