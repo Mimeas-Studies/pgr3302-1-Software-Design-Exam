@@ -207,91 +207,141 @@ public class SqliteDb : IDbManager
     public void SaveData(AnalyzerResult result)
     {
         Logger.Info($"Saving Scan for {result.SourceName}");
-        _dbConnection.Open();
-        SqliteCommand command = _dbConnection.CreateCommand();
-        command.CommandText =
-            @"
-                INSERT INTO Scans 
-                (ScanTime, SourceName, WordCount, CharCount, LongestWord)
-                VALUES (
-                        @ScanTime,
-                        @SourceName,
-                        @WordCount,
-                        @CharacterCount,
-                        @LongestWord
-                );
-            ";
-
-        command.Parameters.AddWithValue("@ScanTime", result.ScanTime);
-        command.Parameters.AddWithValue("@SourceName", result.SourceName);
-        command.Parameters.AddWithValue("@WordCount", result.TotalWordCount);
-        command.Parameters.AddWithValue("@CharacterCount", result.TotalCharCount);
-        command.Parameters.AddWithValue("@LongestWord", result.LongestWord);
-        command.ExecuteNonQuery();
-
-        var query = _dbConnection.CreateCommand();
-        query.CommandText = @"
-            SELECT ScanId FROM Scans
-            WHERE (SourceName, ScanTime) = (@Source, @Time)
-        ";
-
-        query.Parameters.AddWithValue("@Source", result.SourceName);
-        query.Parameters.AddWithValue("@Time", result.ScanTime);
-        var reader = query.ExecuteReader();
 
         int scanId = 0;
-        if (reader.Read())
-        {
-            scanId = reader.GetInt32(0);
-        }
 
-        if (scanId == 0)
+        try
         {
-            throw new Exception("Failed to get ScanId");
-        }
-
-        foreach (var pair in result.HeatmapChar)
-        {
-            command = _dbConnection.CreateCommand();
-            command.CommandText =
+            _dbConnection.Open();
+            SqliteCommand scanCommand = _dbConnection.CreateCommand();
+            scanCommand.CommandText =
                 @"
-                    INSERT INTO CharMap
-                    ('ScanId', 'Character', 'Count')
+                    INSERT INTO Scans 
+                    (ScanTime, SourceName, WordCount, CharCount, LongestWord)
                     VALUES (
-                        @ScanId,
-                        @Character,
-                        @Count
+                            @ScanTime,
+                            @SourceName,
+                            @WordCount,
+                            @CharacterCount,
+                            @LongestWord
                     );
                 ";
 
-            command.Parameters.AddWithValue("@ScanId", scanId);
-            command.Parameters.AddWithValue("@Character", pair.Key);
-            command.Parameters.AddWithValue("@Count", pair.Value);
-            command.ExecuteNonQuery();
-        }
+            scanCommand.Parameters.AddWithValue("@ScanTime", result.ScanTime);
+            scanCommand.Parameters.AddWithValue("@SourceName", result.SourceName);
+            scanCommand.Parameters.AddWithValue("@WordCount", result.TotalWordCount);
+            scanCommand.Parameters.AddWithValue("@CharacterCount", result.TotalCharCount);
+            scanCommand.Parameters.AddWithValue("@LongestWord", result.LongestWord);
+            scanCommand.ExecuteNonQuery();
 
-        foreach (var pair in result.HeatmapWord)
+            SqliteCommand query = _dbConnection.CreateCommand();
+
+            query.CommandText = @"
+                SELECT ScanId FROM Scans
+                WHERE (SourceName, ScanTime) = (@Source, @Time)
+            ";
+
+            query.Parameters.AddWithValue("@Source", result.SourceName);
+            query.Parameters.AddWithValue("@Time", result.ScanTime);
+            SqliteDataReader reader = query.ExecuteReader();
+
+            if (reader.Read())
+            {
+                scanId = reader.GetInt32(0);
+            }
+
+            if (scanId == 0)
+            {
+                throw new Exception("Failed to get ScanId");
+            }
+
+        }
+        catch (Exception err)
         {
-            command = _dbConnection.CreateCommand();
-            command.CommandText =
-                @"
-                    INSERT INTO WordMap
-                    ('ScanId', 'Word', 'Count')
-                    VALUES (
-                        @ScanId,
-                        @Word,
-                        @Count
-                    );
-                ";
+            Logger.Error("Failed when saving AnalyzerResult Scan");
+            Logger.Error(err.ToString());
 
-            command.Parameters.AddWithValue("@ScanId", scanId);
-            command.Parameters.AddWithValue("@Word", pair.Key);
-            command.Parameters.AddWithValue("@Count", pair.Value);
-            command.ExecuteNonQuery();
+            _dbConnection.Close();
+            return;
         }
 
-        _dbConnection.Close();
+        try
+        {
+            SaveCharHeatMap(scanId, result.HeatmapChar);
+            SaveWordHeatMap(scanId, result.HeatmapWord);
+ 
+        }
+        catch (SqliteException err)
+        {
+            Logger.Error(err.ToString());
+        }
+        finally
+        {
+            _dbConnection.Close();
+        }
     }
+
+    private void SaveCharHeatMap(int scanId , Dictionary<string, int> heatmap )
+    {
+        try
+        {
+            foreach (var pair in heatmap)
+            {
+                SqliteCommand charMapCommand = _dbConnection.CreateCommand();
+                charMapCommand.CommandText =
+                    @"
+                            INSERT INTO CharMap
+                            ('ScanId', 'Character', 'Count')
+                            VALUES (
+                                @ScanId,
+                                @Character,
+                                @Count
+                            );
+                        ";
+
+                charMapCommand.Parameters.AddWithValue("@ScanId", scanId);
+                charMapCommand.Parameters.AddWithValue("@Character", pair.Key);
+                charMapCommand.Parameters.AddWithValue("@Count", pair.Value);
+                charMapCommand.ExecuteNonQuery();
+            }
+        }
+        catch (SqliteException sqliteError)
+        {
+            throw new  Exception("Failed to save character heatmap", sqliteError);
+        }
+    }
+
+    private void SaveWordHeatMap(int scanId, Dictionary<string, int> heatmap)
+    {
+        try
+        {
+            foreach (var pair in heatmap)
+            {
+                SqliteCommand wordMapCommand = _dbConnection.CreateCommand();
+                wordMapCommand = _dbConnection.CreateCommand();
+                wordMapCommand.CommandText =
+                    @"
+                        INSERT INTO WordMap
+                        ('ScanId', 'Word', 'Count')
+                        VALUES (
+                            @ScanId,
+                            @Word,
+                            @Count
+                        );
+                    ";
+
+                wordMapCommand.Parameters.AddWithValue("@ScanId", scanId);
+                wordMapCommand.Parameters.AddWithValue("@Word", pair.Key);
+                wordMapCommand.Parameters.AddWithValue("@Count", pair.Value);
+                wordMapCommand.ExecuteNonQuery();
+            }
+        }
+        catch (SqliteException sqliteError)
+        {
+            throw new Exception("Failed to save word heatmap", sqliteError);
+        }
+    }
+
 
     public AnalyzerResult? GetScan(string sourceName, DateTime scanTime)
     {
