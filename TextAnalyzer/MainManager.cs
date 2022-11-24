@@ -13,6 +13,10 @@ public class MainManager {
     private AnalyzerResult? _analyzerResult;
     private readonly IDbManager? _dbManager = new SqliteDb();
     internal static bool IsProgramRunning = true;
+    private List<string>? _textFileArrayList;
+    private List<string>? _textFileNames;
+    private int _selectedFile;
+    private bool _notValidInput;
 
     public void ReadAndAnalyseFile(FileManager fileManager) {
         IEnumerator<string> textStream = FileManager.GetText(fileManager.GetSelectedFile());
@@ -45,6 +49,8 @@ public class MainManager {
     }
 
     private void RetrieveTitlesOfAnalysedTexts() {
+        _notValidInput = true;
+
         IOManager.ClearConsole();
         IOManager.Write("Names of analysed text.");
         var counter = 0;
@@ -55,6 +61,17 @@ public class MainManager {
         }
         IOManager.Write("\nType in menu number to see stats and press <Enter>");
         var selectedTxtFile = Convert.ToInt32(Console.ReadLine());
+        while (_notValidInput) {
+            if (selectedTxtFile > analyzerResultsList.Count || selectedTxtFile <= 0) {
+                Console.WriteLine("Input to high, try again:");
+                selectedTxtFile = Convert.ToInt32(Console.ReadLine());
+            }
+            else {
+                _notValidInput = false;
+                Console.Clear();
+            }
+            _selectedFile = selectedTxtFile;
+        }
         Console.Clear();
         IOManager.Write("Stats of analysed text:");
         Console.WriteLine(analyzerResultsList[selectedTxtFile - 1]);
