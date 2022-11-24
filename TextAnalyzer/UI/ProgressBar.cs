@@ -3,7 +3,10 @@
 using System;
 using System.Text;
 using System.Threading;
-
+/// <summary>
+/// Used a exiting github project as the basis of this code for something fun for the user to look at and hide loading
+/// text analysis https://gist.github.com/DanielSWolf/0ab6a96899cc5377bf54
+/// </summary>
 public class ProgressBar : IDisposable, IProgress<double>
 {
 	private const int blockCount = 10;
