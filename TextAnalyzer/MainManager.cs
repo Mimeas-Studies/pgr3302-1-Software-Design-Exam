@@ -78,6 +78,7 @@ public class MainManager {
     }
 
     private void ShowAnalysedTexts() {
+        IOManager.ClearConsole();
         if (_fileManager.DisplayStoredFiles()) {
             Ui.ProgressBar();
             ReadAndAnalyseFile(_fileManager);
@@ -89,6 +90,7 @@ public class MainManager {
     }
 
     private void RetrieveTextStats() {
+        IOManager.ClearConsole();
         if (RetrieveTitlesOfAnalysedTexts()) {
             Ui.PrintBackToMainMenu();
             var i = Convert.ToInt32(Console.ReadLine());
@@ -102,8 +104,6 @@ public class MainManager {
 
     private void WriteYourOwnText() {
         GenerateTxtFile();
-        Ui.PrintSaveOrDiscard();
-        Console.ReadLine();
     }
 
     private void EndProgram() {
@@ -117,18 +117,22 @@ public class MainManager {
         var selectedMenuOption = Console.ReadKey().KeyChar;
         switch (selectedMenuOption) {
             case '1':
+                IOManager.ClearConsole();
                 ShowAnalysedTexts();
                 break;
 
             case '2':
+                IOManager.ClearConsole();
                 RetrieveTextStats();
                 break;
 
             case '3':
+                IOManager.ClearConsole();
                 WriteYourOwnText();
                 break;
 
             case '4':
+                IOManager.ClearConsole();
                 EndProgram();
                 break;
         }

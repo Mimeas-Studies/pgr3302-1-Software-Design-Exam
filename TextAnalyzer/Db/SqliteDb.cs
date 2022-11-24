@@ -106,7 +106,6 @@ public class SqliteDb : IDbManager
         catch (SqliteException err)
         {
             Logger.Error("Failed to setup tables");
-            Logger.Trace();
         }
         finally
         {
