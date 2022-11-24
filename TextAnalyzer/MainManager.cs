@@ -13,6 +13,10 @@ public class MainManager {
     private AnalyzerResult? _analyzerResult;
     private readonly IDbManager? _dbManager = new SqliteDb();
     internal static bool IsProgramRunning = true;
+    private List<string>? _textFileArrayList;
+    private List<string>? _textFileNames;
+    private int _selectedFile;
+    private bool _notValidInput;
 
     public void ReadAndAnalyseFile(FileManager fileManager) {
         IEnumerator<string> textStream = FileManager.GetText(fileManager.GetSelectedFile());
@@ -39,8 +43,8 @@ public class MainManager {
         }
 
     }
-
-    private void GenerateTxtFile() {
+    private void GenerateTxtFile()
+    { 
         CreateNewFiles.CreateTxtFiles();
     }
 
@@ -52,7 +56,7 @@ public class MainManager {
         var analyzerResultsList = _dbManager?.GetAll();
         for (var i = 0; i < analyzerResultsList.Count; i++) {
             counter++;
-            IOManager.Write(counter + ". " + analyzerResultsList[i].SourceName);
+            IOManager.Write(counter+". "+analyzerResultsList[i].SourceName);
         }
         IOManager.Write("\nType in menu number to see stats and press <Enter>");
         IOManager.Write("Type in <B> to go back press <Enter>");
@@ -64,9 +68,9 @@ public class MainManager {
         retrieveData = true;
         Console.Clear();
         IOManager.Write("Stats of analysed text:");
-        Console.WriteLine(analyzerResultsList[Convert.ToInt32(selectedTxtFile) - 1]);
+        Console.WriteLine(analyzerResultsList[selectedTxtFile - 1]);
         Console.WriteLine();
-        return retrieveData;
+
     }
 
     private void ShowAnalysedTexts() {
@@ -126,7 +130,7 @@ public class MainManager {
                 break;
         }
     }
-
+    
     public static void Main(String[] args) {
         Logger.SetLevel(LogLevel.DEBUG);
         
