@@ -1,8 +1,6 @@
-﻿using TextAnalyzer.UI;
+﻿namespace TextAnalyzer.UI;
 
-namespace TextAnalyzer;
-
-public class Ui
+public static class Ui
 {
     internal static void PrintMenu()
     {
@@ -12,7 +10,8 @@ public class Ui
         Console.WriteLine("4. Exit");
     }
 
-    internal static void PrintSaveOrDiscard() {
+    internal static void PrintSaveOrDiscard()
+    {
         IOManager.Write("1. Save data");
         IOManager.Write("2. Discard data");
     }
@@ -28,10 +27,12 @@ public class Ui
                 Thread.Sleep(20);
             }
         }
+
         Console.Clear();
     }
 
-    internal static void PrintBackToMainMenu() {
+    internal static void PrintBackToMainMenu()
+    {
         Console.WriteLine("1. Back to main menu");
     }
 }

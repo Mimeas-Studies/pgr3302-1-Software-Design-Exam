@@ -13,7 +13,7 @@ public interface IDbManager
     /// <param name="result">The <see cref="AnalyzerResult"/> to save.</param>
     /// <returns>void</returns>
     void SaveData(AnalyzerResult result);
-    
+
     /// <summary>
     /// Retrieve a specific <see cref="AnalyzerResult"/> based on the <paramref name="sourceName"/>
     /// and <paramref name="scanTime"/>.
@@ -30,7 +30,7 @@ public interface IDbManager
     /// </summary>
     /// <returns>A <see cref="List{T}"/> of all <see cref="AnalyzerResult"/> stored in the database.</returns>
     List<AnalyzerResult> GetAll();
-    
+
     /// <summary>
     /// Get a list of all scans performed on a specific source from the database.
     /// </summary>

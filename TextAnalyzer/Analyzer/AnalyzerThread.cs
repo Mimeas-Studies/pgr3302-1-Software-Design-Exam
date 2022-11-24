@@ -1,22 +1,18 @@
 using System.Text.RegularExpressions;
 
-namespace TextAnalyzer.Analyzer; 
+namespace TextAnalyzer.Analyzer;
 
-public class AnalyzerThread {
-    
-    private AnalyzerResult Result { get; set; }
+public class AnalyzerThread
+{
+    private AnalyzerResult Result { get; }
     private Queue<string> Text { get; set; }
     private string Word { get; set; } = "";
-    private int Count { get; set; }
-    
-    private static Regex _regex = new Regex("(?:[^a-z0-9 ]|(?<=['\"])s)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled);
     private readonly IEnumerator<string> _textStream;
 
 
-    public AnalyzerThread(AnalyzerResult result, Queue<string> text) {
-        Result = result;
-        Text = text;
-    }
+    private static readonly Regex Regex = new("(?:[^a-z0-9 ]|(?<=['\"])s)",
+        RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled);
+
 
     public AnalyzerThread(AnalyzerResult result, IEnumerator<string> textStream)
     {
@@ -34,7 +30,8 @@ public class AnalyzerThread {
             Word = Text.Dequeue();
             hasMore = true;
         }
-        else {
+        else
+        {
             lock (_textStream)
             {
                 if (!_textStream.MoveNext()) return hasMore;
@@ -49,9 +46,8 @@ public class AnalyzerThread {
 
     public void Start()
     {
-
         bool hasMore = GetNextWord();
-        while(hasMore)
+        while (hasMore)
         {
             TotalWordCount();
             TotalCharCount();
@@ -62,47 +58,55 @@ public class AnalyzerThread {
             // Get next word
             hasMore = GetNextWord();
         }
-
     }
 
 
-    private void TotalWordCount() {
+    private void TotalWordCount()
+    {
         Result.TotalWordCount++;
     }
 
-    private void TotalCharCount() {
+    private void TotalCharCount()
+    {
         var array = Word.ToCharArray();
         Result.TotalCharCount += array.Length;
     }
 
-    private void CheckLongestWord() {
-        var word = _regex.Replace(Word, String.Empty);
-        
-        if (word.Length > Result.LongestWord.Length) {
+    private void CheckLongestWord()
+    {
+        var word = Regex.Replace(Word, String.Empty);
+
+        if (word.Length > Result.LongestWord.Length)
+        {
             Result.LongestWord = word;
         }
     }
 
-    private void HeatmapWord() {
-        if (Result.HeatmapWord.ContainsKey(Word)) {
+    private void HeatmapWord()
+    {
+        if (Result.HeatmapWord.ContainsKey(Word))
+        {
             Result.HeatmapWord[Word]++;
         }
-
-        else {
+        else
+        {
             Result.HeatmapWord.Add(Word, 1);
         }
     }
 
-    private void HeatmapChar() {
+    private void HeatmapChar()
+    {
         var wordArray = Word.ToCharArray();
-        foreach (var ch in wordArray) {
-            if (Result.HeatmapChar.ContainsKey(ch.ToString())) {
+        foreach (var ch in wordArray)
+        {
+            if (Result.HeatmapChar.ContainsKey(ch.ToString()))
+            {
                 Result.HeatmapChar[ch.ToString()]++;
             }
-            else {
+            else
+            {
                 Result.HeatmapChar.Add(ch.ToString(), 1);
             }
         }
     }
-    
 }
