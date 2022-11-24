@@ -17,6 +17,9 @@ public class Logger
         path += "/log.txt";
         _logfile = new StreamWriter(path, append: true);
         _logfile.AutoFlush = true;
+        
+        // add spacing to logfile for clarity
+        _logfile.Write("\n\n\n");
     }
 
     public static void SetLevel(LogLevel level)

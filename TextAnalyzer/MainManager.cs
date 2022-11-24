@@ -22,7 +22,7 @@ public class MainManager
         _analyzerManager = new AnalyzerManager(textStream, 8);
 
         _analyzerResult = _analyzerManager.StartAnalyze();
-        _analyzerResult.SourceName = fileManager.RetriveAllFileNames();
+        _analyzerResult.SourceName = fileManager.RetrieveAllFileNames();
     }
 
     private void SaveFileInDb()
@@ -159,8 +159,8 @@ public class MainManager
         Logger.SetLevel(LogLevel.Info);
 
         Logger.Info("Initializing Application");
-        var mainManager = new MainManager();
-
+        MainManager mainManager = new();
+        
         //Infinite while loop of the main menu switch case, while isProgramRunning set to true,
         //false value set to five in switch case, exiting program '
         Logger.Info("Running main loop");
