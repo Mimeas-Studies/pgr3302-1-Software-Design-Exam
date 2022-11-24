@@ -167,6 +167,8 @@ public class SqliteDb : IDbManager
     {
         SqliteCommand mapQuery = _dbConnection.CreateCommand();
         mapQuery.CommandText = "SELECT * FROM CharMap WHERE ScanId = @id";
+        mapQuery.Parameters.AddWithValue("@id", scanId);
+        
         SqliteDataReader mapReader = mapQuery.ExecuteReader();
 
         var charMap = new Dictionary<string, int>();
@@ -318,7 +320,6 @@ public class SqliteDb : IDbManager
             foreach (var pair in heatmap)
             {
                 SqliteCommand wordMapCommand = _dbConnection.CreateCommand();
-                wordMapCommand = _dbConnection.CreateCommand();
                 wordMapCommand.CommandText =
                     @"
                         INSERT INTO WordMap
@@ -346,71 +347,109 @@ public class SqliteDb : IDbManager
     public AnalyzerResult? GetScan(string sourceName, DateTime scanTime)
     {
         Logger.Debug($"Retrieving scan {sourceName}:{scanTime}");
-        _dbConnection.Open();
-        var query = _dbConnection.CreateCommand();
-        query.CommandText = @"
-            SELECT * FROM Scans
-            WHERE (SourceName, ScanTime) = (@Source, @Time)
-            LIMIT 1
-        ";
 
-        query.Parameters.AddWithValue("@Source", sourceName);
-        query.Parameters.AddWithValue("@Time", scanTime);
-
-        var reader = query.ExecuteReader();
-
-        AnalyzerResult? result = null;
-        if (reader.Read())
+        AnalyzerResult? scan = null;
+        try
         {
-            result = DeserializeScan(reader);
-        }
+            _dbConnection.Open();
+            var query = _dbConnection.CreateCommand();
+            query.CommandText = @"
+                SELECT * FROM Scans
+                WHERE (SourceName, ScanTime) = (@Source, @Time)
+                LIMIT 1
+            ";
 
-        _dbConnection.Close();
-        return result;
+            query.Parameters.AddWithValue("@Source", sourceName);
+            query.Parameters.AddWithValue("@Time", scanTime);
+
+            var reader = query.ExecuteReader();
+
+            if (reader.Read())
+            {
+                scan = DeserializeScan(reader);
+            }
+        }
+        catch (SqliteException err)
+        {
+            Logger.Error("Failed to retrieve scan");
+            Logger.Error(err.ToString());
+        }
+        finally
+        {
+            _dbConnection.Close();
+        }
+        
+        return scan;
     }
 
     public List<AnalyzerResult> GetWithSource(string scanName)
     {
         Logger.Debug($"Retrieving all saved scans for {scanName}");
         List<AnalyzerResult> scanList = new();
-        _dbConnection.Open();
 
-        SqliteCommand query = _dbConnection.CreateCommand();
-        query.CommandText = @"
-            SELECT * FROM Scans
-            WHERE SourceName = @scanName
-        ";
-
-        query.Parameters.AddWithValue("@scanName", scanName);
-
-        SqliteDataReader queryReader = query.ExecuteReader();
-        while (queryReader.Read())
+        try
         {
-            scanList.Add(DeserializeScan(queryReader));
+            _dbConnection.Open();
+
+            SqliteCommand query = _dbConnection.CreateCommand();
+            query.CommandText = @"
+                SELECT * FROM Scans
+                WHERE SourceName = @scanName
+            ";
+
+            query.Parameters.AddWithValue("@scanName", scanName);
+
+            SqliteDataReader queryReader = query.ExecuteReader();
+            while (queryReader.Read())
+            {
+                scanList.Add(DeserializeScan(queryReader));
+            }
+
+        }
+        catch (SqliteException err)
+        {
+            Logger.Error("Failed to retrieve scans");
+            Logger.Error(err.ToString());
+        }
+        finally
+        {
+            _dbConnection.Close();
         }
 
-        _dbConnection.Close();
         return scanList;
     }
 
     public List<AnalyzerResult> GetAll()
     {
+        
         Logger.Debug("Retrieving all saved scans");
-        _dbConnection.Open();
-        SqliteCommand command = _dbConnection.CreateCommand();
-        command.CommandText = @"
-            SELECT * FROM Scans;
-        ";
 
-        SqliteDataReader query = command.ExecuteReader();
-
-        var scanList = new List<AnalyzerResult>();
-        while (query.Read())
+        List<AnalyzerResult> scanList = new();
+        try
         {
-            scanList.Add(DeserializeScan(query));
+            _dbConnection.Open();
+
+            SqliteCommand command = _dbConnection.CreateCommand();
+            command.CommandText = @"SELECT * FROM Scans;";
+
+            SqliteDataReader query = command.ExecuteReader();
+
+            while (query.Read())
+            {
+                scanList.Add(DeserializeScan(query));
+            }
+
+        }
+        catch (SqliteException err)
+        {
+            Logger.Error("Failed to retrieve all scans");
+            Logger.Error(err.ToString());
+        }
+        finally
+        {
+            _dbConnection.Close();
         }
 
-        _dbConnection.Close();
         return scanList;
     }
 
