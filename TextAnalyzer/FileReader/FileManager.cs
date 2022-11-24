@@ -28,10 +28,6 @@ public class FileManager
     /// Displays files that are located in the resources directory
     /// checks in user input is valid based on files from directory
     /// </summary>
-
-    internal void DisplayStoredFiles()
-    {
-
     internal bool DisplayStoredFiles() {
         _notValidInput = true;
         _textFileArrayList = new List<string>();
@@ -51,19 +47,9 @@ public class FileManager
         }
 
         IOManager.Write("\nType in menu option number and press <Enter> to analyse text");
-
-        var inputInt = Convert.ToInt32(Console.ReadLine());
-        while (_notValidInput)
-        {
-            if (inputInt > _textFileArrayList.Count || inputInt <= 0)
-            {
-
         IOManager.Write("Type in <B> to go back and press <Enter>");
 
         var input = Console.ReadLine();
-        if (input.ToUpper() == "B") {
-            return _displayingFiles = false;
-        }
 
         if (input.Any((x) => char.IsLetter(x))) {
             return _displayingFiles = false;
