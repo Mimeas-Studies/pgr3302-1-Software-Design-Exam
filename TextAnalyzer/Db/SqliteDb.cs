@@ -1,8 +1,6 @@
-using System.Data;
 using System.Reflection;
 using Microsoft.Data.Sqlite;
 using TextAnalyzer.Analyzer;
-using static TextAnalyzer.Logger;
 
 namespace TextAnalyzer.Db;
 
@@ -12,7 +10,7 @@ namespace TextAnalyzer.Db;
 /// <seealso cref="IDbManager"/>
 public class SqliteDb : IDbManager
 {
-    private SqliteConnection _dbConnection;
+    private readonly SqliteConnection _dbConnection;
 
     /// <summary>
     /// A new SqliteDb instance connected to a Sqlite database at the specified path.
@@ -23,7 +21,8 @@ public class SqliteDb : IDbManager
     /// <param name="path">The filepath to the sqlite database.</param>
     public SqliteDb(string path)
     {
-        ConnectionSetup(path);
+        _dbConnection = SqliteDb.ConnectionSetup(path);
+        SqliteDb.TableSetup(_dbConnection);
     }
 
     /// <summary>
@@ -34,13 +33,12 @@ public class SqliteDb : IDbManager
     /// </summary>
     public SqliteDb()
     {
+        Logger.Debug("Using default path for database");
         // Path points to the directory the program is in
         string exeDir = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().Location).LocalPath) ?? ".";
         string dbPath = exeDir + "/analyze.db";
 
-        _dbConnection = ConnectionSetup(dbPath);
-        
-        
+        _dbConnection = SqliteDb.ConnectionSetup(dbPath);
         SqliteDb.TableSetup(_dbConnection);
     }
 
@@ -51,27 +49,36 @@ public class SqliteDb : IDbManager
             DataSource = path,
             Mode = SqliteOpenMode.ReadWriteCreate
         }.ToString();
+        
         Logger.Info($"Connecting to '{connectionString}'");
-
-
-        Logger.Debug($"Using database connection: '{connectionString}'");
         if (!File.Exists(path)) Logger.Warn("Database file does not exist, creating a new one");
 
-        SqliteConnection connection = new SqliteConnection(connectionString);
-        
+        SqliteConnection connection = new(connectionString);
+
         // test connection
-        connection.Open(); 
-        if (connection.State != ConnectionState.Open) Logger.Warn("Database does not connect");
-        else Logger.Info("Database connected");
-        connection.Close();
-        
+        try
+        {
+            connection.Open();
+            Logger.Info("Database Connected");
+            connection.Close();
+        }
+        catch (SqliteException err)
+        {
+            Logger.Error(err.ToString());
+            Logger.Trace("StackTrace:\n" + err.StackTrace);
+        }
+        finally
+        {
+            connection.Close();
+        }
+
         return connection;
     }
 
     private static void TableSetup(SqliteConnection connection)
     {
         Logger.Debug("Setting up Database tables");
-        
+
         SqliteCommand command = connection.CreateCommand();
         command.CommandText =
             @"
@@ -106,7 +113,7 @@ public class SqliteDb : IDbManager
         catch (SqliteException err)
         {
             Logger.Error("Failed to setup tables");
-            Logger.Trace();
+            Logger.Trace("Trace: \n" + err.StackTrace);
         }
         finally
         {
@@ -121,8 +128,61 @@ public class SqliteDb : IDbManager
     /// <returns>The recreated <see cref="AnalyzerResult"/>.</returns>
     private AnalyzerResult DeserializeScan(SqliteDataReader reader)
     {
+        Logger.Trace("Deserializing a scan");
+        
         int scanId = reader.GetInt32(reader.GetOrdinal("ScanId"));
 
+        Dictionary<string, int> wordHeatMap = new();
+        Dictionary<string,int> charHeatMap = new();
+        try
+        {
+            _dbConnection.Open();
+
+            wordHeatMap = ImportWordHeatMap(scanId);
+            charHeatMap = ImportCharHeatMap(scanId);
+        }
+        catch (SqliteException err)
+        {
+            Logger.Error("Failed to import Heatmaps");
+            Logger.Error(err.ToString());
+        }
+        finally
+        {
+            _dbConnection.Close();
+        }
+
+        return new AnalyzerResult
+        {
+            ScanTime = reader.GetDateTime(reader.GetOrdinal("ScanTime")),
+            SourceName = reader.GetString(reader.GetOrdinal("SourceName")),
+            HeatmapChar = charHeatMap,
+            HeatmapWord = wordHeatMap,
+            LongestWord = reader.GetString(reader.GetOrdinal("LongestWord")),
+            TotalCharCount = reader.GetInt32(reader.GetOrdinal("CharCount")),
+            TotalWordCount = reader.GetInt32(reader.GetOrdinal("WordCount"))
+        };
+    }
+
+    private Dictionary<string, int> ImportCharHeatMap(int scanId)
+    {
+        SqliteCommand mapQuery = _dbConnection.CreateCommand();
+        mapQuery.CommandText = "SELECT * FROM CharMap WHERE ScanId = @id";
+        SqliteDataReader mapReader = mapQuery.ExecuteReader();
+
+        var charMap = new Dictionary<string, int>();
+        while (mapReader.Read())
+        {
+            charMap.Add(
+                mapReader.GetString(mapReader.GetOrdinal("Character")),
+                mapReader.GetInt32(mapReader.GetOrdinal("Count"))
+            );
+        }
+
+        return charMap;
+    }
+
+    private Dictionary<string, int> ImportWordHeatMap(int scanId)
+    {
         SqliteCommand mapQuery = _dbConnection.CreateCommand();
         mapQuery.CommandText = "SELECT * FROM WordMap WHERE ScanId = @id";
 
@@ -137,31 +197,9 @@ public class SqliteDb : IDbManager
                 mapReader.GetInt32(mapReader.GetOrdinal("Count"))
             );
         }
-
         mapReader.Close();
 
-        mapQuery.CommandText = "SELECT * FROM CharMap WHERE ScanId = @id";
-        mapReader = mapQuery.ExecuteReader();
-
-        var charMap = new Dictionary<string, int>();
-        while (mapReader.Read())
-        {
-            charMap.Add(
-                mapReader.GetString(mapReader.GetOrdinal("Character")),
-                mapReader.GetInt32(mapReader.GetOrdinal("Count"))
-            );
-        }
-
-        var scan = new AnalyzerResult();
-        scan.ScanTime = reader.GetDateTime(reader.GetOrdinal("ScanTime"));
-        scan.SourceName = reader.GetString(reader.GetOrdinal("SourceName"));
-        scan.HeatmapChar = charMap;
-        scan.HeatmapWord = wordMap;
-        scan.LongestWord = reader.GetString(reader.GetOrdinal("LongestWord"));
-        scan.TotalCharCount = reader.GetInt32(reader.GetOrdinal("CharCount"));
-        scan.TotalWordCount = reader.GetInt32(reader.GetOrdinal("WordCount"));
-
-        return scan;
+        return wordMap;
     }
 
     #region IDbManager Implementation
@@ -284,10 +322,10 @@ public class SqliteDb : IDbManager
     public List<AnalyzerResult> GetWithSource(string scanName)
     {
         Logger.Debug($"Retrieving all saved scans for {scanName}");
-        var scanList = new List<AnalyzerResult>();
+        List<AnalyzerResult> scanList = new();
         _dbConnection.Open();
 
-        var query = _dbConnection.CreateCommand();
+        SqliteCommand query = _dbConnection.CreateCommand();
         query.CommandText = @"
             SELECT * FROM Scans
             WHERE SourceName = @scanName
@@ -295,7 +333,7 @@ public class SqliteDb : IDbManager
 
         query.Parameters.AddWithValue("@scanName", scanName);
 
-        var queryReader = query.ExecuteReader();
+        SqliteDataReader queryReader = query.ExecuteReader();
         while (queryReader.Read())
         {
             scanList.Add(DeserializeScan(queryReader));
@@ -309,12 +347,12 @@ public class SqliteDb : IDbManager
     {
         Logger.Debug("Retrieving all saved scans");
         _dbConnection.Open();
-        var command = _dbConnection.CreateCommand();
+        SqliteCommand command = _dbConnection.CreateCommand();
         command.CommandText = @"
             SELECT * FROM Scans;
         ";
 
-        var query = command.ExecuteReader();
+        SqliteDataReader query = command.ExecuteReader();
 
         var scanList = new List<AnalyzerResult>();
         while (query.Read())
