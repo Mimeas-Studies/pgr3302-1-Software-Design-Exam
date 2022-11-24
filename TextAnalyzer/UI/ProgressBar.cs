@@ -3,12 +3,15 @@
 using System;
 using System.Text;
 using System.Threading;
-
+/// <summary>
+/// Used a exiting github project as the basis of this code for something fun for the user to look at and hide loading
+/// text analysis https://gist.github.com/DanielSWolf/0ab6a96899cc5377bf54
+/// </summary>
 public class ProgressBar : IDisposable, IProgress<double>
 {
-	private const int blockCount = 10;
-	private readonly TimeSpan animationInterval = TimeSpan.FromSeconds(1.0 / 8);
-	private const string animation = @"|/-\";
+    private const int BlockCount = 10;
+    private readonly TimeSpan animationInterval = TimeSpan.FromSeconds(1.0 / 8);
+    private const string Animation = @"|/-\";
 
     private readonly Timer _timer;
 
@@ -38,18 +41,18 @@ public class ProgressBar : IDisposable, IProgress<double>
         {
             if (_disposed) return;
 
-            int progressBlockCount = (int)(_currentProgress * blockCount);
+            int progressBlockCount = (int)(_currentProgress * BlockCount);
             int percent = (int)(_currentProgress * 100);
             string text = string.Format("[{0}{1}] {2,3}% {3}",
-                new string('#', progressBlockCount), new string('-', blockCount - progressBlockCount),
+                new string('#', progressBlockCount), new string('-', BlockCount - progressBlockCount),
                 percent,
-                animation[_animationIndex++ % animation.Length]);
+                Animation[_animationIndex++ % Animation.Length]);
             UpdateText(text);
 
             ResetTimer();
         }
     }
-    
+
     private void UpdateText(string text)
     {
         int commonPrefixLength = 0;
@@ -70,14 +73,16 @@ public class ProgressBar : IDisposable, IProgress<double>
             outputBuilder.Append(' ', overlapCount);
             outputBuilder.Append('\b', overlapCount);
         }
+
         Console.Write(outputBuilder);
         _currentText = text;
     }
+
     private void ResetTimer()
     {
         _timer.Change(animationInterval, TimeSpan.FromMilliseconds(-1));
     }
-    
+
     public void Dispose()
     {
         lock (_timer)

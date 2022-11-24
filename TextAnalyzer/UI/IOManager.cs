@@ -1,4 +1,5 @@
 namespace TextAnalyzer.UI;
+
 /// <summary>
 /// IOManager, user-provided objects, stores assets, outputs and loads them as inputs to downstream assets
 /// </summary>
@@ -11,16 +12,16 @@ public class IOManager
         var input = Console.ReadLine();
         return input;
     }
-    
+
 //Standard writeline, writes specified data to input stream
     public static void Write(string text)
     {
-        Console.WriteLine(text); 
+        Console.WriteLine(text);
     }
+
 //Clears console screen and buffer of display information 
     public static void ClearConsole()
     {
         Console.Clear();
     }
-    
 }
