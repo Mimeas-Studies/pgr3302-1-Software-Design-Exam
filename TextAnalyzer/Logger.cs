@@ -1,5 +1,5 @@
 using System.Reflection;
-using System.Text;
+using TextAnalyzer.Logging;
 
 namespace TextAnalyzer;
 
@@ -11,7 +11,7 @@ public class Logger
 
     private Logger()
     {
-        _level = LogLevel.WARN;
+        _level = LogLevel.Warn;
         
         string path = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().Location).LocalPath) ?? ".";
         path += "/log.txt";
@@ -29,11 +29,14 @@ public class Logger
         Logger.Instance()._logfile = new StreamWriter(path, append: true);
     }
     
-    public static Logger Instance()
+    // Instancing can be private since the instance only utilized through
+    // through the convenience methods bellow
+    private static Logger Instance()
     {
         return _logger ??= new Logger();
     }
 
+    // Actual log formatting
     public static void Log(LogLevel level, string text)
     {
         Logger logger = Logger.Instance();
@@ -44,51 +47,52 @@ public class Logger
         logger._logfile.Flush();
     }
 
-    public static void Debug(string text)
-    {
-        Logger.Log(LogLevel.DEBUG, text);
-    }
+    #region Covenience methods
     
-    public static void Info(string text)
-    {
-        Logger.Log(LogLevel.INFO, text);
-    }
-    
-    public static void Warn(string text)
-    {
-        Logger.Log(LogLevel.WARN, text);
-    }
-    
-    public static void Error(string text)
-    {
-        Logger.Log(LogLevel.ERROR, text);
-    }
-}
-
-public enum LogLevel
-{
-    ERROR,
-    WARN,
-    INFO,
-    DEBUG
-}
-
-static class LogLevelToString
-{
-    public static string ToString(this LogLevel level)
-    {
-        switch (level)
+        /// <summary>
+        ///     Use 'Debug' when logging behavior of a function
+        /// </summary>
+        /// <param name="text"></param>
+        public static void Debug(string text)
         {
-            case LogLevel.DEBUG:
-                return "DEBUG";
-            case LogLevel.INFO:
-                return "INFO";
-            case LogLevel.WARN:
-                return "WARN";
-            case LogLevel.ERROR:
-                return "ERROR";
-            default:
-                throw new ArgumentOutOfRangeException();
+            Logger.Log(LogLevel.Debug, text);
         }
-    }
+        
+        /// <summary>
+        ///     Use 'Info' when logging behavior for the program as a whole
+        /// </summary>
+        /// <param name="text"></param>
+        public static void Info(string text)
+        {
+            Logger.Log(LogLevel.Info, text);
+        }
+        
+        /// <summary>
+        ///     Use 'Warn' when encountering an unexpected but recoverable problem 
+        /// </summary>
+        /// <param name="text"></param>
+        public static void Warn(string text)
+        {
+            Logger.Log(LogLevel.Warn, text);
+        }
+        
+        /// <summary>
+        ///      Use 'Error' when encountering errors?
+        /// </summary>
+        /// <param name="text"></param>
+        public static void Error(string text)
+        {
+            Logger.Log(LogLevel.Error, text);
+        }
+        
+        /// <summary>
+        ///     Use 'Trace' to monitor often recurring function or changing variables
+        /// </summary>
+        /// <param name="text"></param>
+        public static void Trace(string text)
+        {
+            Logger.Log(LogLevel.Trace, text);
+        }
+    
+    #endregion
 }
