@@ -20,6 +20,7 @@ public class FileManager
     /// <returns>a list of strings in a queue</returns>
     public static IEnumerator<string> GetText(string filepath)
     {
+    Logger.Debug($"Reading from: {filepath}");
         IEnumerable<string> text = File.ReadLines(filepath);
         return text.GetEnumerator();
     }
@@ -92,7 +93,7 @@ public class FileManager
     /// Checks if there are existing file names added previously
     /// </summary>
     /// <returns> returns selected file name with user input </returns>
-    public string RetriveAllFileNames()
+    public string RetrieveAllFileNames() 
     {
         if (_textFileNames != null) return _textFileNames[_selectedFile - 1];
         return "No files are stored on disk";
