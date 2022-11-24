@@ -132,52 +132,56 @@ public class SqliteDb : IDbManager
         
         int scanId = reader.GetInt32(reader.GetOrdinal("ScanId"));
 
+        AnalyzerResult result = new();
         Dictionary<string, int> wordHeatMap = new();
         Dictionary<string,int> charHeatMap = new();
         try
         {
-            _dbConnection.Open();
-
             wordHeatMap = ImportWordHeatMap(scanId);
             charHeatMap = ImportCharHeatMap(scanId);
+            
+            result = new AnalyzerResult
+            {
+                ScanTime = reader.GetDateTime(reader.GetOrdinal("ScanTime")),
+                SourceName = reader.GetString(reader.GetOrdinal("SourceName")),
+                HeatmapChar = charHeatMap,
+                HeatmapWord = wordHeatMap,
+                LongestWord = reader.GetString(reader.GetOrdinal("LongestWord")),
+                TotalCharCount = reader.GetInt32(reader.GetOrdinal("CharCount")),
+                TotalWordCount = reader.GetInt32(reader.GetOrdinal("WordCount"))
+            };
         }
-        catch (SqliteException err)
+        catch (SqliteException sqliteErr)
         {
-            Logger.Error("Failed to import Heatmaps");
-            Logger.Error(err.ToString());
-        }
-        finally
-        {
-            _dbConnection.Close();
+            throw new Exception("Failed to import Heatmaps", sqliteErr);
         }
 
-        return new AnalyzerResult
-        {
-            ScanTime = reader.GetDateTime(reader.GetOrdinal("ScanTime")),
-            SourceName = reader.GetString(reader.GetOrdinal("SourceName")),
-            HeatmapChar = charHeatMap,
-            HeatmapWord = wordHeatMap,
-            LongestWord = reader.GetString(reader.GetOrdinal("LongestWord")),
-            TotalCharCount = reader.GetInt32(reader.GetOrdinal("CharCount")),
-            TotalWordCount = reader.GetInt32(reader.GetOrdinal("WordCount"))
-        };
+        return result;
     }
 
     private Dictionary<string, int> ImportCharHeatMap(int scanId)
     {
-        SqliteCommand mapQuery = _dbConnection.CreateCommand();
-        mapQuery.CommandText = "SELECT * FROM CharMap WHERE ScanId = @id";
-        mapQuery.Parameters.AddWithValue("@id", scanId);
-        
-        SqliteDataReader mapReader = mapQuery.ExecuteReader();
+        Dictionary<string, int> charMap = new();
 
-        var charMap = new Dictionary<string, int>();
-        while (mapReader.Read())
+        try
         {
-            charMap.Add(
-                mapReader.GetString(mapReader.GetOrdinal("Character")),
-                mapReader.GetInt32(mapReader.GetOrdinal("Count"))
-            );
+            SqliteCommand mapQuery = _dbConnection.CreateCommand();
+            mapQuery.CommandText = "SELECT * FROM CharMap WHERE ScanId = @id";
+            mapQuery.Parameters.AddWithValue("@id", scanId);
+            SqliteDataReader mapReader = mapQuery.ExecuteReader();
+
+            while (mapReader.Read())
+            {
+                charMap.Add(
+                    mapReader.GetString(mapReader.GetOrdinal("Character")),
+                    mapReader.GetInt32(mapReader.GetOrdinal("Count"))
+                );
+            }
+
+        }
+        catch (SqliteException e)
+        {
+            throw new Exception("Failed to retrieve character heatmap", e);
         }
 
         return charMap;
@@ -185,22 +189,30 @@ public class SqliteDb : IDbManager
 
     private Dictionary<string, int> ImportWordHeatMap(int scanId)
     {
-        SqliteCommand mapQuery = _dbConnection.CreateCommand();
-        mapQuery.CommandText = "SELECT * FROM WordMap WHERE ScanId = @id";
+        Dictionary<string, int> wordMap = new();
 
-        mapQuery.Parameters.AddWithValue("@id", scanId);
-        SqliteDataReader mapReader = mapQuery.ExecuteReader();
-
-        var wordMap = new Dictionary<string, int>();
-        while (mapReader.Read())
+        try
         {
-            wordMap.Add(
-                mapReader.GetString(mapReader.GetOrdinal("Word")),
-                mapReader.GetInt32(mapReader.GetOrdinal("Count"))
-            );
-        }
-        mapReader.Close();
+            SqliteCommand mapQuery = _dbConnection.CreateCommand();
+            mapQuery.CommandText = "SELECT * FROM WordMap WHERE ScanId = @id";
+            mapQuery.Parameters.AddWithValue("@id", scanId);
+            SqliteDataReader mapReader = mapQuery.ExecuteReader();
+            
+            while (mapReader.Read())
+            {
+                wordMap.Add(
+                    mapReader.GetString(mapReader.GetOrdinal("Word")),
+                    mapReader.GetInt32(mapReader.GetOrdinal("Count"))
+                );
+            }
+            mapReader.Close();
 
+        }
+        catch (SqliteException e)
+        {
+            throw new Exception("Failed to read word heatmap", e);
+        }
+        
         return wordMap;
     }
 
@@ -352,7 +364,8 @@ public class SqliteDb : IDbManager
         try
         {
             _dbConnection.Open();
-            var query = _dbConnection.CreateCommand();
+            
+            SqliteCommand query = _dbConnection.CreateCommand();
             query.CommandText = @"
                 SELECT * FROM Scans
                 WHERE (SourceName, ScanTime) = (@Source, @Time)
@@ -362,14 +375,14 @@ public class SqliteDb : IDbManager
             query.Parameters.AddWithValue("@Source", sourceName);
             query.Parameters.AddWithValue("@Time", scanTime);
 
-            var reader = query.ExecuteReader();
+            SqliteDataReader reader = query.ExecuteReader();
 
             if (reader.Read())
             {
                 scan = DeserializeScan(reader);
             }
         }
-        catch (SqliteException err)
+        catch (Exception err)
         {
             Logger.Error("Failed to retrieve scan");
             Logger.Error(err.ToString());
@@ -406,7 +419,7 @@ public class SqliteDb : IDbManager
             }
 
         }
-        catch (SqliteException err)
+        catch (Exception err)
         {
             Logger.Error("Failed to retrieve scans");
             Logger.Error(err.ToString());
@@ -440,7 +453,7 @@ public class SqliteDb : IDbManager
             }
 
         }
-        catch (SqliteException err)
+        catch (Exception err)
         {
             Logger.Error("Failed to retrieve all scans");
             Logger.Error(err.ToString());
