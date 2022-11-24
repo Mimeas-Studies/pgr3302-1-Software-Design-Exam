@@ -13,10 +13,14 @@ public class MainManager {
     private AnalyzerResult? _analyzerResult;
     private readonly IDbManager? _dbManager = new SqliteDb();
     internal static bool IsProgramRunning = true;
+    private List<string>? _textFileArrayList;
+    private List<string>? _textFileNames;
+    private int _selectedFile;
+    private bool _notValidInput;
 
     public void ReadAndAnalyseFile(FileManager fileManager) {
         IEnumerator<string> textStream = FileManager.GetText(fileManager.GetSelectedFile());
-        _analyzerManager = new AnalyzerManager(textStream, 1);
+        _analyzerManager = new AnalyzerManager(textStream, 8);
         
         _analyzerResult = _analyzerManager.StartAnalyze();
         _analyzerResult.SourceName = fileManager.RetriveAllFileNames();
@@ -44,7 +48,8 @@ public class MainManager {
         CreateNewFiles.CreateTxtFiles();
     }
 
-    private void RetrieveTitlesOfAnalysedTexts() {
+    private bool RetrieveTitlesOfAnalysedTexts() {
+        var retrieveData = false;
         IOManager.ClearConsole();
         IOManager.Write("Names of analysed text.");
         var counter = 0;
@@ -54,29 +59,44 @@ public class MainManager {
             IOManager.Write(counter+". "+analyzerResultsList[i].SourceName);
         }
         IOManager.Write("\nType in menu number to see stats and press <Enter>");
-        var selectedTxtFile = Convert.ToInt32(Console.ReadLine());
+        IOManager.Write("Type in <B> to go back press <Enter>");
+        var selectedTxtFile = Console.ReadLine();
+        if (selectedTxtFile.ToUpper() == "B") {
+            return retrieveData;
+        } else if (selectedTxtFile.Any((x) => char.IsLetter(x))) {
+            return retrieveData;
+        }
+
+        retrieveData = true;
         Console.Clear();
         IOManager.Write("Stats of analysed text:");
-        Console.WriteLine(analyzerResultsList[selectedTxtFile - 1]);
+        Console.WriteLine(analyzerResultsList[Convert.ToInt32(selectedTxtFile) - 1]);
         Console.WriteLine();
+        return retrieveData;
 
     }
 
     private void ShowAnalysedTexts() {
-        _fileManager.DisplayStoredFiles();
-        Ui.ProgressBar();
-        ReadAndAnalyseFile(_fileManager);
-        SaveFileInDb();
+        if (_fileManager.DisplayStoredFiles()) {
+            Ui.ProgressBar();
+            ReadAndAnalyseFile(_fileManager);
+            SaveFileInDb();
+        }
+        else {
+            Console.Clear();
+        }
     }
 
     private void RetrieveTextStats() {
-        RetrieveTitlesOfAnalysedTexts();
-        Ui.PrintBackToMainMenu();
-        var i = Convert.ToInt32(Console.ReadLine());
+        if (RetrieveTitlesOfAnalysedTexts()) {
+            Ui.PrintBackToMainMenu();
+            var i = Convert.ToInt32(Console.ReadLine());
+            Console.Clear();
+            if (i != 1) {
+                IsProgramRunning = false;
+            }
+        } 
         Console.Clear();
-        if (i != 1) {
-            IsProgramRunning = false; 
-        }
     }
 
     private void WriteYourOwnText() {
@@ -87,27 +107,26 @@ public class MainManager {
 
     private void EndProgram() {
         IOManager.Write("\nExiting...");
-        IsProgramRunning = false; 
+        IsProgramRunning = false;
     }
 
     public void Menu() {
         IOManager.Write("\nType in menu option number");
         Ui.PrintMenu();
         var selectedMenuOption = Console.ReadKey().KeyChar;
-        switch (selectedMenuOption)
-        {
+        switch (selectedMenuOption) {
             case '1':
                 ShowAnalysedTexts();
                 break;
-            
+
             case '2':
                 RetrieveTextStats();
                 break;
-            
+
             case '3':
                 WriteYourOwnText();
                 break;
-            
+
             case '4':
                 EndProgram();
                 break;
@@ -115,13 +134,20 @@ public class MainManager {
     }
     
     public static void Main(String[] args) {
+        Logger.SetLevel(LogLevel.DEBUG);
+        
+        Logger.Debug("Initializing Application");
         //Infinite while loop of the main menu switch case, while isProgramRunning set to true,
         //false value set to five in switch case, exiting program '
         var mainManager = new MainManager();
+        
+        Logger.Debug("Application started");
         while (IsProgramRunning)
         {
             mainManager.Menu();
         }
+        
+        Logger.Info("Exited Application");
     }
     
 }

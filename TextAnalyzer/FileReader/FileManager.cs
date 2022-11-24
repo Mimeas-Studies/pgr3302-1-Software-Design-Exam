@@ -11,6 +11,7 @@ public class FileManager
     private List<string>? _textFileNames;
     private int _selectedFile;
     private bool _notValidInput;
+    private bool _displayingFiles = false;
 
     /// <summary>
     /// Reads .txt files and adds strings separated by an empty space to a queue.
@@ -27,8 +28,11 @@ public class FileManager
     /// Displays files that are located in the resources directory
     /// checks in user input is valid based on files from directory
     /// </summary>
+
     internal void DisplayStoredFiles()
     {
+
+    internal bool DisplayStoredFiles() {
         _notValidInput = true;
         _textFileArrayList = new List<string>();
         _textFileNames = new List<string>();
@@ -53,8 +57,23 @@ public class FileManager
         {
             if (inputInt > _textFileArrayList.Count || inputInt <= 0)
             {
+
+        IOManager.Write("Type in <B> to go back and press <Enter>");
+
+        var input = Console.ReadLine();
+        if (input.ToUpper() == "B") {
+            return _displayingFiles = false;
+        }
+
+        if (input.Any((x) => char.IsLetter(x))) {
+            return _displayingFiles = false;
+        }
+
+        var intInput = Convert.ToInt32(input);
+        while (_notValidInput) {
+            if (intInput > _textFileArrayList.Count || intInput <= 0) {
                 Console.WriteLine("Input to high, try again:");
-                inputInt = Convert.ToInt32(Console.ReadLine());
+                intInput = Convert.ToInt32(Console.ReadLine());
             }
             else
             {
@@ -62,8 +81,10 @@ public class FileManager
                 Console.Clear();
             }
 
-            _selectedFile = inputInt;
+            _selectedFile = intInput;
         }
+
+        return _displayingFiles = true;
     }
 
     /// <summary>

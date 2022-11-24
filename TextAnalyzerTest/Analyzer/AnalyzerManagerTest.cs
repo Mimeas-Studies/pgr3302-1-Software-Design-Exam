@@ -115,4 +115,16 @@ public class AnalyzerManagerTest
         Assert.AreEqual(true, result.HeatmapChar.ContainsKey("p"));
         Assert.AreEqual(3, result.HeatmapChar["l"]);
     }
+  
+    [Test]
+    [Ignore("Testing of files to large for uploading to github")]
+    public void Funtest()
+    {
+
+        var textFile = FileManager.GetText("Resources/generated.txt");
+        var test = new AnalyzerManager(textFile, 4);
+        var something = test.StartAnalyze();
+        
+        Console.WriteLine("analyzed " + something.TotalWordCount + " words");
+    }
 }
