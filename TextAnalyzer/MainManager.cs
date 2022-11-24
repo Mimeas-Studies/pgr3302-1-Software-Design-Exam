@@ -115,13 +115,20 @@ public class MainManager {
     }
     
     public static void Main(String[] args) {
+        Logger.SetLevel(LogLevel.DEBUG);
+        
+        Logger.Debug("Initializing Application");
         //Infinite while loop of the main menu switch case, while isProgramRunning set to true,
         //false value set to five in switch case, exiting program '
         var mainManager = new MainManager();
+        
+        Logger.Debug("Application started");
         while (IsProgramRunning)
         {
             mainManager.Menu();
         }
+        
+        Logger.Info("Exited Application");
     }
     
 }

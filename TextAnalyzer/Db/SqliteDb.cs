@@ -1,6 +1,7 @@
 using System.Reflection;
 using Microsoft.Data.Sqlite;
 using TextAnalyzer.Analyzer;
+using TextAnalyzer;
 
 namespace TextAnalyzer.Db;
 
@@ -33,28 +34,32 @@ public class SqliteDb: IDbManager
     public SqliteDb()
     {
         // Path points to the directory the program is in
-        string? exePath = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().Location).LocalPath);
-        if (exePath is null)
-        {
-            exePath = ".";
-        }
-        ConnectionSetup(exePath + "/analyze.db");
+        string exeDir = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().Location).LocalPath) ?? ".";
+
+        ConnectionSetup(exeDir + "/analyze.db");
     }
 
     private void ConnectionSetup(string path)
     {
-        string connectionString = new SqliteConnectionStringBuilder()
+        
+        
+        string connectionString = new SqliteConnectionStringBuilder
         {
             DataSource = path,
-            Mode = SqliteOpenMode.ReadWriteCreate,
+            Mode = SqliteOpenMode.ReadWriteCreate
         }.ToString();
+        
+        Logger.Debug($"Opening Database connection: '{connectionString}'");
+        if (!File.Exists(path)) Logger.Warn("Database file not found, will create a new one");
 
         _dbConnection = new SqliteConnection(connectionString);
+        Logger.Info("Database connected");
         SqliteDb.TableSetup(_dbConnection);
     }
 
     private static void TableSetup(SqliteConnection connection)
     {
+        Logger.Debug("Setting up Database tables");
         connection.Open();
         SqliteCommand command = connection.CreateCommand();
         command.CommandText =
@@ -138,6 +143,7 @@ public class SqliteDb: IDbManager
     
     public void SaveData(AnalyzerResult result)
     {
+        Logger.Debug($"Saving Scan for {result.SourceName}");
         _dbConnection.Open();
         SqliteCommand command = _dbConnection.CreateCommand();
         command.CommandText = 
@@ -223,6 +229,7 @@ public class SqliteDb: IDbManager
     
     public AnalyzerResult? GetScan(string sourceName, DateTime scanTime)
     {
+        Logger.Debug($"Retrieving scan {sourceName}:{scanTime}");
         _dbConnection.Open();
         var query = _dbConnection.CreateCommand();
         query.CommandText = @"
@@ -248,6 +255,7 @@ public class SqliteDb: IDbManager
 
     public List<AnalyzerResult> GetWithSource(string scanName)
     {
+        Logger.Debug($"Retrieving all saved scans for {scanName}");
         var scanList = new List<AnalyzerResult>();
         _dbConnection.Open();
         
@@ -270,6 +278,7 @@ public class SqliteDb: IDbManager
 
     public List<AnalyzerResult> GetAll()
     {
+        Logger.Debug("Retrieving all saved scans");
         _dbConnection.Open();
         var command = _dbConnection.CreateCommand();
         command.CommandText = @"
