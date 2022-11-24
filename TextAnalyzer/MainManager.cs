@@ -1,6 +1,7 @@
 ﻿using TextAnalyzer.Analyzer;
 using TextAnalyzer.Db;
 using TextAnalyzer.UI;
+using TextAnalyzer.Logging;
 
 namespace TextAnalyzer; 
 
@@ -134,14 +135,14 @@ public class MainManager {
     }
     
     public static void Main(String[] args) {
-        Logger.SetLevel(LogLevel.DEBUG);
+        Logger.SetLevel(LogLevel.Info);
         
-        Logger.Debug("Initializing Application");
-        //Infinite while loop of the main menu switch case, while isProgramRunning set to true,
-        //false value set to five in switch case, exiting program '
+        Logger.Info("Initializing Application");
         var mainManager = new MainManager();
         
-        Logger.Debug("Application started");
+        //Infinite while loop of the main menu switch case, while isProgramRunning set to true,
+        //false value set to five in switch case, exiting program '
+        Logger.Info("Running main loop");
         while (IsProgramRunning)
         {
             mainManager.Menu();

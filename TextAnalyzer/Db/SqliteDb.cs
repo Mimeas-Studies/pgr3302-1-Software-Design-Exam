@@ -1,7 +1,8 @@
+using System.Data;
 using System.Reflection;
 using Microsoft.Data.Sqlite;
 using TextAnalyzer.Analyzer;
-using TextAnalyzer;
+using static TextAnalyzer.Logger;
 
 namespace TextAnalyzer.Db;
 
@@ -9,7 +10,7 @@ namespace TextAnalyzer.Db;
 /// An implementation of <see cref="IDbManager"/> for storing <see cref="AnalyzerResult"/> in an Sqlite database.
 /// </summary>
 /// <seealso cref="IDbManager"/>
-public class SqliteDb: IDbManager
+public class SqliteDb : IDbManager
 {
     private SqliteConnection _dbConnection;
 
@@ -24,7 +25,7 @@ public class SqliteDb: IDbManager
     {
         ConnectionSetup(path);
     }
-    
+
     /// <summary>
     /// A new SqliteDb instance connected to a Sqlite database located in the executables directory.
     /// <para>
@@ -35,32 +36,42 @@ public class SqliteDb: IDbManager
     {
         // Path points to the directory the program is in
         string exeDir = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().Location).LocalPath) ?? ".";
+        string dbPath = exeDir + "/analyze.db";
 
-        ConnectionSetup(exeDir + "/analyze.db");
+        _dbConnection = ConnectionSetup(dbPath);
+        
+        
+        SqliteDb.TableSetup(_dbConnection);
     }
 
-    private void ConnectionSetup(string path)
+    private static SqliteConnection ConnectionSetup(string path)
     {
-        
-        
         string connectionString = new SqliteConnectionStringBuilder
         {
             DataSource = path,
             Mode = SqliteOpenMode.ReadWriteCreate
         }.ToString();
-        
-        Logger.Debug($"Opening Database connection: '{connectionString}'");
-        if (!File.Exists(path)) Logger.Warn("Database file not found, will create a new one");
+        Logger.Info($"Connecting to '{connectionString}'");
 
-        _dbConnection = new SqliteConnection(connectionString);
-        Logger.Info("Database connected");
-        SqliteDb.TableSetup(_dbConnection);
+
+        Logger.Debug($"Using database connection: '{connectionString}'");
+        if (!File.Exists(path)) Logger.Warn("Database file does not exist, creating a new one");
+
+        SqliteConnection connection = new SqliteConnection(connectionString);
+        
+        // test connection
+        connection.Open(); 
+        if (connection.State != ConnectionState.Open) Logger.Warn("Database does not connect");
+        else Logger.Info("Database connected");
+        connection.Close();
+        
+        return connection;
     }
 
     private static void TableSetup(SqliteConnection connection)
     {
         Logger.Debug("Setting up Database tables");
-        connection.Open();
+        
         SqliteCommand command = connection.CreateCommand();
         command.CommandText =
             @"
@@ -86,8 +97,21 @@ public class SqliteDb: IDbManager
                     'Count' INT
                 )
             ";
-        command.ExecuteNonQuery();
-        connection.Close();
+
+        try
+        {
+            connection.Open();
+            command.ExecuteNonQuery();
+        }
+        catch (SqliteException err)
+        {
+            Logger.Error("Failed to setup tables");
+            Logger.Trace();
+        }
+        finally
+        {
+            connection.Close();
+        }
     }
 
     /// <summary>
@@ -99,11 +123,11 @@ public class SqliteDb: IDbManager
     {
         int scanId = reader.GetInt32(reader.GetOrdinal("ScanId"));
 
-        var mapQuery = _dbConnection.CreateCommand();
+        SqliteCommand mapQuery = _dbConnection.CreateCommand();
         mapQuery.CommandText = "SELECT * FROM WordMap WHERE ScanId = @id";
-            
+
         mapQuery.Parameters.AddWithValue("@id", scanId);
-        var mapReader = mapQuery.ExecuteReader();
+        SqliteDataReader mapReader = mapQuery.ExecuteReader();
 
         var wordMap = new Dictionary<string, int>();
         while (mapReader.Read())
@@ -113,11 +137,12 @@ public class SqliteDb: IDbManager
                 mapReader.GetInt32(mapReader.GetOrdinal("Count"))
             );
         }
+
         mapReader.Close();
-            
+
         mapQuery.CommandText = "SELECT * FROM CharMap WHERE ScanId = @id";
         mapReader = mapQuery.ExecuteReader();
-            
+
         var charMap = new Dictionary<string, int>();
         while (mapReader.Read())
         {
@@ -135,18 +160,18 @@ public class SqliteDb: IDbManager
         scan.LongestWord = reader.GetString(reader.GetOrdinal("LongestWord"));
         scan.TotalCharCount = reader.GetInt32(reader.GetOrdinal("CharCount"));
         scan.TotalWordCount = reader.GetInt32(reader.GetOrdinal("WordCount"));
-        
+
         return scan;
     }
 
     #region IDbManager Implementation
-    
+
     public void SaveData(AnalyzerResult result)
     {
-        Logger.Debug($"Saving Scan for {result.SourceName}");
+        Logger.Info($"Saving Scan for {result.SourceName}");
         _dbConnection.Open();
         SqliteCommand command = _dbConnection.CreateCommand();
-        command.CommandText = 
+        command.CommandText =
             @"
                 INSERT INTO Scans 
                 (ScanTime, SourceName, WordCount, CharCount, LongestWord)
@@ -175,17 +200,18 @@ public class SqliteDb: IDbManager
         query.Parameters.AddWithValue("@Source", result.SourceName);
         query.Parameters.AddWithValue("@Time", result.ScanTime);
         var reader = query.ExecuteReader();
-        
+
         int scanId = 0;
         if (reader.Read())
         {
             scanId = reader.GetInt32(0);
         }
+
         if (scanId == 0)
         {
             throw new Exception("Failed to get ScanId");
         }
-        
+
         foreach (var pair in result.HeatmapChar)
         {
             command = _dbConnection.CreateCommand();
@@ -205,6 +231,7 @@ public class SqliteDb: IDbManager
             command.Parameters.AddWithValue("@Count", pair.Value);
             command.ExecuteNonQuery();
         }
+
         foreach (var pair in result.HeatmapWord)
         {
             command = _dbConnection.CreateCommand();
@@ -224,9 +251,10 @@ public class SqliteDb: IDbManager
             command.Parameters.AddWithValue("@Count", pair.Value);
             command.ExecuteNonQuery();
         }
+
         _dbConnection.Close();
     }
-    
+
     public AnalyzerResult? GetScan(string sourceName, DateTime scanTime)
     {
         Logger.Debug($"Retrieving scan {sourceName}:{scanTime}");
@@ -248,7 +276,7 @@ public class SqliteDb: IDbManager
         {
             result = DeserializeScan(reader);
         }
-        
+
         _dbConnection.Close();
         return result;
     }
@@ -258,12 +286,13 @@ public class SqliteDb: IDbManager
         Logger.Debug($"Retrieving all saved scans for {scanName}");
         var scanList = new List<AnalyzerResult>();
         _dbConnection.Open();
-        
+
         var query = _dbConnection.CreateCommand();
         query.CommandText = @"
             SELECT * FROM Scans
             WHERE SourceName = @scanName
         ";
+
         query.Parameters.AddWithValue("@scanName", scanName);
 
         var queryReader = query.ExecuteReader();
@@ -271,7 +300,7 @@ public class SqliteDb: IDbManager
         {
             scanList.Add(DeserializeScan(queryReader));
         }
-        
+
         _dbConnection.Close();
         return scanList;
     }
@@ -290,10 +319,12 @@ public class SqliteDb: IDbManager
         var scanList = new List<AnalyzerResult>();
         while (query.Read())
         {
-           scanList.Add(DeserializeScan(query)); 
+            scanList.Add(DeserializeScan(query));
         }
+
         _dbConnection.Close();
         return scanList;
     }
+
     #endregion
 }
