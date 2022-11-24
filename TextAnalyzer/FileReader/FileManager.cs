@@ -10,6 +10,7 @@ public class FileManager {
     private List<string>? _textFileNames;
     private int _selectedFile;
     private bool _notValidInput;
+    private bool _displayingFiles = false;
     
     /// <summary>
     /// Reads .txt files and adds strings separated by an empty space to a queue.
@@ -25,7 +26,7 @@ public class FileManager {
     /// Displays files that are located in the resources directory
     /// checks in user input is valid based on files from directory
     /// </summary>
-    internal void DisplayStoredFiles() {
+    internal bool DisplayStoredFiles() {
         _notValidInput = true;
         _textFileArrayList = new List<string>();
         _textFileNames = new List<string>();
@@ -43,18 +44,26 @@ public class FileManager {
         }
 
         IOManager.Write("\nType in menu option number and press <Enter> to analyse text");
+        IOManager.Write("Type in <B> to go back and press <Enter>");
         
-        var inputInt = Convert.ToInt32(Console.ReadLine());
-        while (_notValidInput) {
-            if (inputInt > _textFileArrayList.Count || inputInt <= 0) {
-                Console.WriteLine("Input to high, try again:");
-                inputInt = Convert.ToInt32(Console.ReadLine());
+        var input = Console.ReadLine();
+        if (input.ToUpper() == "B") {
+            return _displayingFiles = false;
+        } 
+        else {
+            var intInput = Convert.ToInt32(input);
+            while (_notValidInput) {
+                if (intInput > _textFileArrayList.Count || intInput <= 0) {
+                    Console.WriteLine("Input to high, try again:");
+                    intInput = Convert.ToInt32(Console.ReadLine());
+                }
+                else {
+                    _notValidInput = false;
+                    Console.Clear();
+                }
+                _selectedFile = intInput;
             }
-            else {
-                _notValidInput = false;
-                Console.Clear();
-            }
-            _selectedFile = inputInt;
+            return _displayingFiles = true;
         }
     }
 

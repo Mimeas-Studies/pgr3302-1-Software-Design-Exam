@@ -2,10 +2,10 @@
 using TextAnalyzer.Db;
 using TextAnalyzer.UI;
 
-namespace TextAnalyzer; 
+namespace TextAnalyzer;
 
 /// <summary>
-/// Used as a facade, creates and instance of many classes in the project and make them cooperate.
+/// Used as a facade, creates instances of many if not all classes in the project and make them cooperate.
 /// </summary>
 public class MainManager {
     private FileManager? _fileManager = new FileManager();
@@ -17,7 +17,7 @@ public class MainManager {
     public void ReadAndAnalyseFile(FileManager fileManager) {
         IEnumerator<string> textStream = FileManager.GetText(fileManager.GetSelectedFile());
         _analyzerManager = new AnalyzerManager(textStream, 8);
-        
+
         _analyzerResult = _analyzerManager.StartAnalyze();
         _analyzerResult.SourceName = fileManager.RetriveAllFileNames();
     }
@@ -37,46 +37,60 @@ public class MainManager {
                 IOManager.Write("Data discarded\n");
                 break;
         }
-
     }
-    private void GenerateTxtFile()
-    { 
+
+    private void GenerateTxtFile() {
         CreateNewFiles.CreateTxtFiles();
     }
 
-    private void RetrieveTitlesOfAnalysedTexts() {
+    private bool RetrieveTitlesOfAnalysedTexts() {
+        var retrieveData = false;
         IOManager.ClearConsole();
         IOManager.Write("Names of analysed text.");
         var counter = 0;
         var analyzerResultsList = _dbManager?.GetAll();
         for (var i = 0; i < analyzerResultsList.Count; i++) {
             counter++;
-            IOManager.Write(counter+". "+analyzerResultsList[i].SourceName);
+            IOManager.Write(counter + ". " + analyzerResultsList[i].SourceName);
         }
+
         IOManager.Write("\nType in menu number to see stats and press <Enter>");
-        var selectedTxtFile = Convert.ToInt32(Console.ReadLine());
+        IOManager.Write("Type in <B> to go back press <Enter>");
+        var selectedTxtFile = Console.ReadLine();
+        if (selectedTxtFile.ToUpper() == "B") {
+            return retrieveData;
+        }
+
+        retrieveData = true;
         Console.Clear();
         IOManager.Write("Stats of analysed text:");
-        Console.WriteLine(analyzerResultsList[selectedTxtFile - 1]);
+        Console.WriteLine(analyzerResultsList[Convert.ToInt32(selectedTxtFile) - 1]);
         Console.WriteLine();
-
+        return retrieveData;
     }
 
     private void ShowAnalysedTexts() {
-        _fileManager.DisplayStoredFiles();
-        Ui.ProgressBar();
-        ReadAndAnalyseFile(_fileManager);
-        SaveFileInDb();
+        if (_fileManager.DisplayStoredFiles()) {
+            Ui.ProgressBar();
+            ReadAndAnalyseFile(_fileManager);
+
+            SaveFileInDb();
+        }
+        else {
+            Console.Clear();
+        }
     }
 
     private void RetrieveTextStats() {
-        RetrieveTitlesOfAnalysedTexts();
-        Ui.PrintBackToMainMenu();
-        var i = Convert.ToInt32(Console.ReadLine());
+        if (RetrieveTitlesOfAnalysedTexts()) {
+            Ui.PrintBackToMainMenu();
+            var i = Convert.ToInt32(Console.ReadLine());
+            Console.Clear();
+            if (i != 1) {
+                IsProgramRunning = false;
+            }
+        } 
         Console.Clear();
-        if (i != 1) {
-            IsProgramRunning = false; 
-        }
     }
 
     private void WriteYourOwnText() {
@@ -87,41 +101,38 @@ public class MainManager {
 
     private void EndProgram() {
         IOManager.Write("\nExiting...");
-        IsProgramRunning = false; 
+        IsProgramRunning = false;
     }
 
     public void Menu() {
         IOManager.Write("\nType in menu option number");
         Ui.PrintMenu();
         var selectedMenuOption = Console.ReadKey().KeyChar;
-        switch (selectedMenuOption)
-        {
+        switch (selectedMenuOption) {
             case '1':
                 ShowAnalysedTexts();
                 break;
-            
+
             case '2':
                 RetrieveTextStats();
                 break;
-            
+
             case '3':
                 WriteYourOwnText();
                 break;
-            
+
             case '4':
                 EndProgram();
                 break;
         }
     }
-    
+
     public static void Main(String[] args) {
         //Infinite while loop of the main menu switch case, while isProgramRunning set to true,
         //false value set to five in switch case, exiting program '
         var mainManager = new MainManager();
-        while (IsProgramRunning)
-        {
+        while (IsProgramRunning) {
             mainManager.Menu();
         }
     }
-    
 }
