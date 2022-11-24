@@ -5,7 +5,8 @@ namespace TextAnalyzer;
 /// <summary>
 /// Handles txt files by storing them in Queue's, displays them from directories and return them
 /// </summary>
-public class FileManager {
+public class FileManager
+{
     private List<string>? _textFileArrayList;
     private List<string>? _textFileNames;
     private int _selectedFile;
@@ -17,7 +18,8 @@ public class FileManager {
     /// </summary>
     /// <param name="filepath">takes in a file from  bin/debug/net6.0/resources</param>
     /// <returns>a list of strings in a queue</returns>
-    public static IEnumerator<string> GetText(string filepath) {
+    public static IEnumerator<string> GetText(string filepath)
+    {
         IEnumerable<string> text = File.ReadLines(filepath);
         return text.GetEnumerator();
     }
@@ -26,6 +28,10 @@ public class FileManager {
     /// Displays files that are located in the resources directory
     /// checks in user input is valid based on files from directory
     /// </summary>
+
+    internal void DisplayStoredFiles()
+    {
+
     internal bool DisplayStoredFiles() {
         _notValidInput = true;
         _textFileArrayList = new List<string>();
@@ -36,7 +42,8 @@ public class FileManager {
         var directoryInfo = new DirectoryInfo("Resources"); //Insert directory
         FileInfo[] files = directoryInfo.GetFiles("*.txt"); //Get files the end with .txt
         var counter = 0;
-        foreach (FileInfo file in files) {
+        foreach (FileInfo file in files)
+        {
             counter++;
             Console.WriteLine(counter + ". " + file.Name);
             _textFileNames.Add(file.Name);
@@ -44,6 +51,13 @@ public class FileManager {
         }
 
         IOManager.Write("\nType in menu option number and press <Enter> to analyse text");
+
+        var inputInt = Convert.ToInt32(Console.ReadLine());
+        while (_notValidInput)
+        {
+            if (inputInt > _textFileArrayList.Count || inputInt <= 0)
+            {
+
         IOManager.Write("Type in <B> to go back and press <Enter>");
 
         var input = Console.ReadLine();
@@ -61,7 +75,8 @@ public class FileManager {
                 Console.WriteLine("Input to high, try again:");
                 intInput = Convert.ToInt32(Console.ReadLine());
             }
-            else {
+            else
+            {
                 _notValidInput = false;
                 Console.Clear();
             }
@@ -76,7 +91,8 @@ public class FileManager {
     /// Checks if there are existing files added previously
     /// </summary>
     /// <returns> returns selected file path with user input </returns>
-    public string GetSelectedFile() {
+    public string GetSelectedFile()
+    {
         if (_textFileArrayList != null) return _textFileArrayList[_selectedFile - 1];
         return "No files are stored on disk";
     }
@@ -86,7 +102,8 @@ public class FileManager {
     /// Checks if there are existing file names added previously
     /// </summary>
     /// <returns> returns selected file name with user input </returns>
-    public string RetriveAllFileNames() {
+    public string RetriveAllFileNames()
+    {
         if (_textFileNames != null) return _textFileNames[_selectedFile - 1];
         return "No files are stored on disk";
     }
