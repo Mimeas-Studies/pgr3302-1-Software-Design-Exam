@@ -63,13 +63,16 @@ public class MainManager {
         var selectedTxtFile = Console.ReadLine();
         if (selectedTxtFile.ToUpper() == "B") {
             return retrieveData;
+        } else if (selectedTxtFile.Any((x) => char.IsLetter(x))) {
+            return retrieveData;
         }
 
         retrieveData = true;
         Console.Clear();
         IOManager.Write("Stats of analysed text:");
-        Console.WriteLine(analyzerResultsList[selectedTxtFile - 1]);
+        Console.WriteLine(analyzerResultsList[Convert.ToInt32(selectedTxtFile) - 1]);
         Console.WriteLine();
+        return retrieveData;
 
     }
 
@@ -77,7 +80,6 @@ public class MainManager {
         if (_fileManager.DisplayStoredFiles()) {
             Ui.ProgressBar();
             ReadAndAnalyseFile(_fileManager);
-
             SaveFileInDb();
         }
         else {

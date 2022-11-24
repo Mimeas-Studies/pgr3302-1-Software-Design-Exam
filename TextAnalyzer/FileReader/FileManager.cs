@@ -11,7 +11,7 @@ public class FileManager {
     private int _selectedFile;
     private bool _notValidInput;
     private bool _displayingFiles = false;
-    
+
     /// <summary>
     /// Reads .txt files and adds strings separated by an empty space to a queue.
     /// </summary>
@@ -45,26 +45,31 @@ public class FileManager {
 
         IOManager.Write("\nType in menu option number and press <Enter> to analyse text");
         IOManager.Write("Type in <B> to go back and press <Enter>");
-        
+
         var input = Console.ReadLine();
         if (input.ToUpper() == "B") {
             return _displayingFiles = false;
-        } 
-        else {
-            var intInput = Convert.ToInt32(input);
-            while (_notValidInput) {
-                if (intInput > _textFileArrayList.Count || intInput <= 0) {
-                    Console.WriteLine("Input to high, try again:");
-                    intInput = Convert.ToInt32(Console.ReadLine());
-                }
-                else {
-                    _notValidInput = false;
-                    Console.Clear();
-                }
-                _selectedFile = intInput;
-            }
-            return _displayingFiles = true;
         }
+
+        if (input.Any((x) => char.IsLetter(x))) {
+            return _displayingFiles = false;
+        }
+
+        var intInput = Convert.ToInt32(input);
+        while (_notValidInput) {
+            if (intInput > _textFileArrayList.Count || intInput <= 0) {
+                Console.WriteLine("Input to high, try again:");
+                intInput = Convert.ToInt32(Console.ReadLine());
+            }
+            else {
+                _notValidInput = false;
+                Console.Clear();
+            }
+
+            _selectedFile = intInput;
+        }
+
+        return _displayingFiles = true;
     }
 
     /// <summary>
@@ -76,7 +81,7 @@ public class FileManager {
         return "No files are stored on disk";
     }
 
-    
+
     /// <summary>
     /// Checks if there are existing file names added previously
     /// </summary>
