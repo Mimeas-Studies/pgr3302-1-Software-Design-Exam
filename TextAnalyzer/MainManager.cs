@@ -2,10 +2,10 @@
 using TextAnalyzer.Db;
 using TextAnalyzer.UI;
 
-namespace TextAnalyzer;
+namespace TextAnalyzer; 
 
 /// <summary>
-/// Used as a facade, creates instances of many if not all classes in the project and make them cooperate.
+/// Used as a facade, creates and instance of many classes in the project and make them cooperate.
 /// </summary>
 public class MainManager {
     private FileManager? _fileManager = new FileManager();
@@ -17,7 +17,7 @@ public class MainManager {
     public void ReadAndAnalyseFile(FileManager fileManager) {
         IEnumerator<string> textStream = FileManager.GetText(fileManager.GetSelectedFile());
         _analyzerManager = new AnalyzerManager(textStream, 8);
-
+        
         _analyzerResult = _analyzerManager.StartAnalyze();
         _analyzerResult.SourceName = fileManager.RetriveAllFileNames();
     }
@@ -37,6 +37,7 @@ public class MainManager {
                 IOManager.Write("Data discarded\n");
                 break;
         }
+
     }
 
     private void GenerateTxtFile() {
@@ -53,7 +54,6 @@ public class MainManager {
             counter++;
             IOManager.Write(counter + ". " + analyzerResultsList[i].SourceName);
         }
-
         IOManager.Write("\nType in menu number to see stats and press <Enter>");
         IOManager.Write("Type in <B> to go back press <Enter>");
         var selectedTxtFile = Console.ReadLine();
@@ -128,11 +128,20 @@ public class MainManager {
     }
 
     public static void Main(String[] args) {
+        Logger.SetLevel(LogLevel.DEBUG);
+        
+        Logger.Debug("Initializing Application");
         //Infinite while loop of the main menu switch case, while isProgramRunning set to true,
         //false value set to five in switch case, exiting program '
         var mainManager = new MainManager();
-        while (IsProgramRunning) {
+        
+        Logger.Debug("Application started");
+        while (IsProgramRunning)
+        {
             mainManager.Menu();
         }
+        
+        Logger.Info("Exited Application");
     }
+    
 }
