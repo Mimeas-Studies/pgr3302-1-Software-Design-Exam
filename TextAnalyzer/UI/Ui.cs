@@ -4,10 +4,10 @@ public static class Ui
 {
     internal static void PrintMenu()
     {
-        Console.WriteLine("1. Analyze Texts");
-        Console.WriteLine("2. Get text stats");
-        Console.WriteLine("3. Write your own text");
-        Console.WriteLine("4. Exit");
+        IOManager.Write("1. Analyze Texts");
+        IOManager.Write("2. Get text stats");
+        IOManager.Write("3. Write your own text");
+        IOManager.Write("4. Exit");
     }
 
     internal static void PrintSaveOrDiscard()
@@ -18,7 +18,7 @@ public static class Ui
 
     internal static void ProgressBar()
     {
-        Console.WriteLine("Analyzing Text ...");
+        IOManager.Write("Analyzing Text ...");
         using (var progress = new ProgressBar())
         {
             for (int i = 0; i <= 100; i++)
@@ -28,11 +28,11 @@ public static class Ui
             }
         }
 
-        Console.Clear();
+        IOManager.ClearConsole();
     }
 
     internal static void PrintBackToMainMenu()
     {
-        Console.WriteLine("1. Back to main menu");
+        IOManager.Write("1. Back to main menu");
     }
 }

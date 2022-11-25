@@ -27,18 +27,18 @@ public class MainManager
 
     private void SaveFileInDb()
     {
-        Console.WriteLine(_analyzerResult?.ToString());
+        IOManager.Write(_analyzerResult?.ToString());
         Ui.PrintSaveOrDiscard();
         var option = Console.ReadLine();
         switch (option)
         {
             case "1":
                 _dbManager?.SaveData(_analyzerResult!);
-                Console.Clear();
+                IOManager.ClearConsole();
                 IOManager.Write("Data stored\n");
                 break;
             case "2":
-                Console.Clear();
+                IOManager.ClearConsole();
                 IOManager.Write("Data discarded\n");
                 break;
         }
@@ -75,10 +75,9 @@ public class MainManager
         }
 
         retrieveData = true;
-        Console.Clear();
+        IOManager.ClearConsole();
         IOManager.Write("Stats of analysed text:");
         Console.WriteLine(analyzerResultsList[Convert.ToInt32(selectedTxtFile) - 1]);
-        Console.WriteLine();
         return retrieveData;
     }
 
@@ -91,10 +90,6 @@ public class MainManager
             ReadAndAnalyseFile(_fileManager);
             SaveFileInDb();
         }
-        else
-        {
-            Console.Clear();
-        }
     }
 
     private void RetrieveTextStats()
@@ -104,14 +99,12 @@ public class MainManager
         {
             Ui.PrintBackToMainMenu();
             var i = Convert.ToInt32(Console.ReadLine());
-            Console.Clear();
+            IOManager.ClearConsole();
             if (i != 1)
             {
                 _isProgramRunning = false;
             }
         }
-
-        Console.Clear();
     }
 
     private void WriteYourOwnText()
@@ -127,6 +120,7 @@ public class MainManager
 
     private void Menu()
     {
+        IOManager.ClearConsole();
         IOManager.Write("\nType in menu option number");
         Ui.PrintMenu();
         var selectedMenuOption = Console.ReadKey().KeyChar;
@@ -145,6 +139,7 @@ public class MainManager
             case '3':
                 IOManager.ClearConsole();
                 WriteYourOwnText();
+                
                 break;
 
             case '4':

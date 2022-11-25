@@ -43,7 +43,7 @@ public class FileManager
         foreach (FileInfo file in files)
         {
             counter++;
-            Console.WriteLine(counter + ". " + file.Name);
+            IOManager.Write(counter + ". " + file.Name);
             _textFileNames.Add(file.Name);
             _textFileArrayList.Add(file.FullName);
         }
@@ -51,7 +51,7 @@ public class FileManager
         IOManager.Write("\nType in menu option number and press <Enter> to analyse text");
         IOManager.Write("Type in <B> to go back and press <Enter>");
 
-        var input = Console.ReadLine();
+        var input = IOManager.Input();
 
         if (input.Any((x) => char.IsLetter(x)))
         {
@@ -63,13 +63,12 @@ public class FileManager
         {
             if (intInput > _textFileArrayList.Count || intInput <= 0)
             {
-                Console.WriteLine("Input to high, try again:");
-                intInput = Convert.ToInt32(Console.ReadLine());
+                IOManager.Write("Input to high, try again:");
+                intInput = Convert.ToInt32(IOManager.Input());
             }
             else
             {
                 _notValidInput = false;
-                Console.Clear();
             }
 
             _selectedFile = intInput;
