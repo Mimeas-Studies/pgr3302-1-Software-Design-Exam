@@ -16,14 +16,6 @@ public class MainManager
     private readonly IDbManager? _dbManager = new SqliteDb();
     private static bool _isProgramRunning = true;
 
-    public MainManager()
-    {
-        // MainManager assumes a 'Resources' folder exists
-        DirectoryInfo resources = new("Resources");
-        Logger.Warn("Resources folder not found, creating a new one");
-        if (!resources.Exists) resources.Create();
-    }
-
     private void ReadAndAnalyseFile(FileManager fileManager)
     {
         IEnumerator<string> textStream = FileManager.GetText(fileManager.GetSelectedFile());
@@ -160,8 +152,13 @@ public class MainManager
     public static void Main(string[] args)
     {
         Logger.SetLevel(LogLevel.Info);
-
         Logger.Info("Initializing Application");
+        
+        // MainManager assumes a 'Resources' folder exists
+        DirectoryInfo resources = new("Resources");
+        Logger.Warn("Resources folder not found, creating a new one");
+        if (!resources.Exists) resources.Create();
+
         MainManager mainManager = new();
         
         //Infinite while loop of the main menu switch case, while isProgramRunning set to true,
