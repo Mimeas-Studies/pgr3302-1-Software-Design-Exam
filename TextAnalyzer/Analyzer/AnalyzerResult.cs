@@ -1,5 +1,8 @@
 namespace TextAnalyzer.Analyzer;
 
+/// <summary>
+/// DTO class for keeping track during analyze and complete report.
+/// </summary>
 public class AnalyzerResult
 {
     //Reason for initialise is to have zero null values and to have guard values 
