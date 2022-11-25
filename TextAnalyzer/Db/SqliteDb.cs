@@ -39,6 +39,7 @@ public class SqliteDb : IDbManager
         string dbPath = exeDir + "/analyze.db";
 
         _dbConnection = SqliteDb.ConnectionSetup(dbPath);
+        SqliteDb.TableSetup(_dbConnection);
     }
 
     private static SqliteConnection ConnectionSetup(string path)
