@@ -8,17 +8,17 @@ entity AnalyzerManager
 collections FileManager
 database DB
 
+autoactivate on
+
+activate MainManager 
+
 group Init 
 
-activate MainManager #grey
-
 MainManager -> FileManager: Init
-activate FileManager
-FileManager -> FileManager: Create 'Resources'\nif folder doesn't\nexists
+note over FileManager: Create 'Resources'\nif folder doesn't\nexists
 return
 
 MainManager -> DB: Init
-activate DB
 ref over DB: Create DB\nif not exists
 return
 
@@ -29,37 +29,28 @@ loop Main loop
 alt New Scan
 
 MainManager -> User: Get Action
-activate User
-
 return New Scan
 
 MainManager -> FileManager: Analyze text
-activate FileManager
-
     FileManager -> User: Select a file
-    activate User
     return selection
     
 return file handle
     
 MainManager -> AnalyzerManager
-    activate AnalyzerManager
     ref over AnalyzerManager: multithreaded analyze
 return
 
 alt save scan
-FileManager -> User: Result + SaveScan?
-activate User
+MainManager -> User: Result + SaveScan?
 return save
 
 MainManager -> DB: Result
-    activate DB
     ref over DB: Save scan
 return
     
 else dont save
-FileManager -> User: Result + SaveScan?
-activate User
+MainManager -> User: Result + SaveScan?
 return dont save
 
 end alt
@@ -67,14 +58,18 @@ end alt
 else Get text stats
 
 MainManager -> User: Get action
-activate User
 return Get text stats
 
 MainManager -> DB: Get saved scans list
-activate DB
 return List
 
+MainManager -> User: List
+return Selected scan
 
+MainManager -> DB: Get Saved Scan
+return Scan
+
+MainManager -> User: Scan
 
 end alt
 
