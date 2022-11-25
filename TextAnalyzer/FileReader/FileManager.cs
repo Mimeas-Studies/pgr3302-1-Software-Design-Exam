@@ -13,6 +13,14 @@ public class FileManager
     private bool _notValidInput;
     private bool _displayingFiles = false;
 
+    public FileManager()
+    {
+        // MainManager assumes a 'Resources' folder exists
+        DirectoryInfo resources = new("Resources");
+        Logger.Warn("Resources folder not found, creating a new one");
+        if (!resources.Exists) resources.Create();
+    }
+
     /// <summary>
     /// Reads .txt files and adds strings separated by an empty space to a queue.
     /// </summary>

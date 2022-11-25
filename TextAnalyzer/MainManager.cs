@@ -153,11 +153,6 @@ public class MainManager
     {
         Logger.SetLevel(LogLevel.Info);
         Logger.Info("Initializing Application");
-        
-        // MainManager assumes a 'Resources' folder exists
-        DirectoryInfo resources = new("Resources");
-        Logger.Warn("Resources folder not found, creating a new one");
-        if (!resources.Exists) resources.Create();
 
         MainManager mainManager = new();
         
