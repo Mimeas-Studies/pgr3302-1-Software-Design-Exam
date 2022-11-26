@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 namespace TextAnalyzer.Analyzer;
 
 /// <summary>
-/// Class made for multithreading. Initialised from AnalyzerManager and get feeded words to analyze.
+/// Class made for multithreading. Initialised from AnalyzerManager and get fed words to analyze.
 /// </summary>
 public class AnalyzerThread
 {
@@ -11,7 +11,7 @@ public class AnalyzerThread
     private Queue<string> Text { get; set; }
     private string Word { get; set; } = "";
     private readonly IEnumerator<string> _textStream;
-    
+
     private static readonly Regex Regex = new("(?:[^a-z0-9 ]|(?<=['\"])s)",
         RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled);
 
@@ -42,7 +42,7 @@ public class AnalyzerThread
             hasMore = GetNextWord();
         }
     }
-    
+
     private bool GetNextWord()
     {
         get_word:
@@ -74,13 +74,13 @@ public class AnalyzerThread
 
     private void TotalCharCount()
     {
-        var array = Word.ToCharArray();
+        char[] array = Word.ToCharArray();
         Result.TotalCharCount += array.Length;
     }
 
     private void CheckLongestWord()
     {
-        var word = Regex.Replace(Word, String.Empty);
+        string word = Regex.Replace(Word, string.Empty);
 
         if (word.Length > Result.LongestWord.Length)
         {
@@ -102,8 +102,8 @@ public class AnalyzerThread
 
     private void HeatmapChar()
     {
-        var wordArray = Word.ToCharArray();
-        foreach (var ch in wordArray)
+        char[] wordArray = Word.ToCharArray();
+        foreach (char ch in wordArray)
         {
             if (Result.HeatmapChar.ContainsKey(ch.ToString()))
             {
