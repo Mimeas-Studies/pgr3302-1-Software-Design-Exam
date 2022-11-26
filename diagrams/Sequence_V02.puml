@@ -38,7 +38,7 @@ MainManager -> FileManager: Analyze text
 return file handle
     
 MainManager -> AnalyzerManager
-    ref over AnalyzerManager: multithreaded analyze
+    ref over AnalyzerManager: AnalyzerManager:Analyze
 return
 
 alt save scan
@@ -46,7 +46,7 @@ MainManager -> User: Result + SaveScan?
 return save
 
 MainManager -> DBManager: Result
-    ref over DBManager: Save scan
+    ref over DBManager: DBManager:Save
 return
     
 else dont save

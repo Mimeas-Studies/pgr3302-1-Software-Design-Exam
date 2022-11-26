@@ -1,0 +1,28 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autoactivate on
+
+participant MainManager
+participant FileManager
+entity OS
+
+group FileManager: Initialize
+
+MainManager -> FileManager: Initialize
+FileManager -> OS: Resource folder\nexists?
+return yes/no
+
+alt no
+
+FileManager -> OS: Create folder\n'Resources'
+return
+else yes
+note over FileManager: noop
+end alt
+
+return
+
+end group
+
+@enduml

@@ -1,0 +1,41 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+participant MainManager
+participant AnalyzerManager
+collections Threads
+
+MainManager -> AnalyzerManager: textstream
+activate AnalyzerManager
+
+loop over n threads
+AnalyzerManager -> Threads: new AnalyzerThread
+activate Threads
+end
+
+loop
+
+alt wordbuffer has more
+
+Threads -> Threads: Analyze word
+
+else word buffer empty
+
+group lock textstream
+alt textstream has more lines
+Threads -> Threads: load line to wordbuffer
+
+else textstream empty
+note over Threads: break
+end alt
+end group
+
+end alt
+
+end
+return AnalyzerResult
+
+AnalyzerManager -> AnalyzerManager: add AnalyzerResults together
+return AnalyzerResult
+
+@enduml

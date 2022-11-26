@@ -1,0 +1,46 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autoactivate on
+
+
+participant MainManager
+participant DbManager
+database DbDriver
+entity OS
+
+group Initialize
+
+MainManager -> DbManager
+DbManager -> OS: get executable file directory
+return directory
+
+DbManager -> DbDriver: create db if not\nexists and connect
+return connection
+
+DbManager -> DbDriver: create tables if not exists
+return
+
+return
+end
+
+group Save scan
+
+MainManager -> DbManager: AnalyzerResult
+DbManager -> DbDriver: add row in 'Scans' table
+return
+
+loop for each character in AnalyzerResult's character heatmap
+DbManager -> DbDriver: add row for character in 'CharMap'
+return
+end
+
+loop for each word in AnalyzerResult's word heatmap
+DbManager -> DbDriver: add row for character in 'WordMap'
+return
+end
+
+return
+end
+
+@enduml
