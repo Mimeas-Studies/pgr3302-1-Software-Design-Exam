@@ -1,0 +1,94 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+'participents
+actor User
+participant MainManager
+entity AnalyzerManager
+collections FileManager
+database DBManager
+
+autoactivate on
+
+User -> MainManager: Start program
+
+group Initialize
+
+MainManager -> FileManager
+    ref over FileManager: FileManager:Initialize
+return
+
+MainManager -> DBManager
+    ref over DBManager: DBManager:Initialize
+return
+
+end group
+
+loop Main loop
+
+MainManager -> User: Get Action
+return action
+
+alt Action: New Scan
+
+MainManager -> FileManager: Analyze text
+    FileManager -> User: Select a file
+    return selection
+    
+return file handle
+    
+MainManager -> AnalyzerManager
+    ref over AnalyzerManager: AnalyzerManager:Analyze
+return
+
+alt save scan
+MainManager -> User: Result + SaveScan?
+return save
+
+MainManager -> DBManager: Result
+    ref over DBManager: DBManager:Save
+return
+    
+else dont save
+MainManager -> User: Result + SaveScan?
+return dont save
+note over MainManager: continue main loop
+end alt
+
+else Action: Get text stats
+
+MainManager -> DBManager: Get saved scans list
+return List
+
+MainManager -> User: List
+return Selected scan
+
+MainManager -> DBManager: Get Saved Scan
+return Scan
+
+MainManager -> User: Scan
+return continue
+
+else Action: Write your own text
+
+MainManager -> User: Write a filename
+return filename
+
+alt filename is not null
+
+note over MainManager: create file if not exists
+
+MainManager -> User: Write text
+return text
+
+note over MainManager: write text to file
+end alt
+
+else Action: Exit
+
+note over MainManager: end main loop
+
+end alt
+
+end loop
+@enduml
