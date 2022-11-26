@@ -6,30 +6,30 @@ actor User
 participant MainManager
 entity AnalyzerManager
 collections FileManager
-database DB
+database DBManager
 
 autoactivate on
 
-activate MainManager 
+User -> MainManager: Start program
 
-group Init 
+group Initialize
 
-MainManager -> FileManager: Init
-note over FileManager: Create 'Resources'\nif folder doesn't\nexists
+MainManager -> FileManager
+    ref over FileManager: FileManager:Initialize
 return
 
-MainManager -> DB: Init
-ref over DB: Create DB\nif not exists
+MainManager -> DBManager
+    ref over DBManager: DBManager:Initialize
 return
 
 end group
 
 loop Main loop
 
-alt New Scan
-
 MainManager -> User: Get Action
-return New Scan
+return action
+
+alt Action: New Scan
 
 MainManager -> FileManager: Analyze text
     FileManager -> User: Select a file
@@ -45,31 +45,48 @@ alt save scan
 MainManager -> User: Result + SaveScan?
 return save
 
-MainManager -> DB: Result
-    ref over DB: Save scan
+MainManager -> DBManager: Result
+    ref over DBManager: Save scan
 return
     
 else dont save
 MainManager -> User: Result + SaveScan?
 return dont save
-
+note over MainManager: continue main loop
 end alt
 
-else Get text stats
+else Action: Get text stats
 
-MainManager -> User: Get action
-return Get text stats
-
-MainManager -> DB: Get saved scans list
+MainManager -> DBManager: Get saved scans list
 return List
 
 MainManager -> User: List
 return Selected scan
 
-MainManager -> DB: Get Saved Scan
+MainManager -> DBManager: Get Saved Scan
 return Scan
 
 MainManager -> User: Scan
+return continue
+
+else Action: Write your own text
+
+MainManager -> User: Write a filename
+return filename
+
+alt filename is not null
+
+note over MainManager: create file if not exists
+
+MainManager -> User: Write text
+return text
+
+note over MainManager: write text to file
+end alt
+
+else Action: Exit
+
+note over MainManager: end main loop
 
 end alt
 
