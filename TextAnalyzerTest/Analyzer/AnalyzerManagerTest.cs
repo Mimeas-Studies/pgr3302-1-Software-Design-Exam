@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using TextAnalyzer;
 using TextAnalyzer.Analyzer;
+using TextAnalyzer.FileReader;
 
 namespace TextAnalyzerTest.Analyzer;
 

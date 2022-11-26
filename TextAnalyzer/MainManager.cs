@@ -1,5 +1,6 @@
 ﻿using TextAnalyzer.Analyzer;
 using TextAnalyzer.Db;
+using TextAnalyzer.FileReader;
 using TextAnalyzer.UI;
 using TextAnalyzer.Logging;
 
@@ -16,13 +17,13 @@ public class MainManager
     private readonly IDbManager? _dbManager = new SqliteDb();
     private static bool _isProgramRunning = true;
 
-    private void ReadAndAnalyseFile(FileManager fileManager)
+    private void ReadAndAnalyseFile(string filename)
     {
-        IEnumerator<string> textStream = FileManager.GetText(fileManager.GetSelectedFile());
+        IEnumerator<string> textStream = FileManager.GetText(filename);
         _analyzerManager = new AnalyzerManager(textStream, 8);
 
         _analyzerResult = _analyzerManager.StartAnalyze();
-        _analyzerResult.SourceName = fileManager.RetrieveAllFileNames();
+        _analyzerResult.SourceName = filename;
     }
 
     private void SaveFileInDb()
@@ -84,12 +85,13 @@ public class MainManager
     private void ShowAnalysedTexts()
     {
         IOManager.ClearConsole();
-        if (_fileManager.DisplayStoredFiles())
-        {
-            Ui.ProgressBar();
-            ReadAndAnalyseFile(_fileManager);
-            SaveFileInDb();
-        }
+        string? selectedFile = _fileManager.ChooseStoredFile();
+        
+        if (selectedFile is null) return;
+        
+        Ui.ProgressBar();
+        ReadAndAnalyseFile(selectedFile);
+        SaveFileInDb();
     }
 
     private void RetrieveTextStats()

@@ -1,6 +1,6 @@
 using TextAnalyzer.UI;
 
-namespace TextAnalyzer;
+namespace TextAnalyzer.FileReader;
 
 /// <summary>
 /// Handles txt files by storing them in Queue's, displays them from directories and return them
@@ -9,19 +9,15 @@ public class FileManager
 {
     private List<string>? _textFileArrayList;
     private List<string>? _textFileNames;
-    private int _selectedFile;
-    private bool _notValidInput;
-    private bool _displayingFiles = false;
 
     public FileManager()
     {
         // MainManager assumes a 'Resources' folder exists
         DirectoryInfo resources = new("Resources");
-        if (!resources.Exists)
-        {
-            Logger.Warn("Resources folder not found, creating a new one");
-            resources.Create();
-        }
+        
+        if (resources.Exists) return;
+        Logger.Warn("Resources folder not found, creating a new one");
+        resources.Create();
     }
 
     /// <summary>
@@ -40,17 +36,16 @@ public class FileManager
     /// Displays files that are located in the resources directory
     /// checks in user input is valid based on files from directory
     /// </summary>
-    internal bool DisplayStoredFiles()
+    internal string? ChooseStoredFile()
     {
-        _notValidInput = true;
         _textFileArrayList = new List<string>();
         _textFileNames = new List<string>();
 
         IOManager.ClearConsole();
         IOManager.Write("Display texts that arent analysed.");
-        var directoryInfo = new DirectoryInfo("Resources"); //Insert directory
+        DirectoryInfo directoryInfo = new DirectoryInfo("Resources"); //Insert directory
         FileInfo[] files = directoryInfo.GetFiles("*.txt"); //Get files the end with .txt
-        var counter = 0;
+        int counter = 0;
         foreach (FileInfo file in files)
         {
             counter++;
@@ -62,40 +57,21 @@ public class FileManager
         IOManager.Write("\nType in menu option number and press <Enter> to analyse text");
         IOManager.Write("Type in <B> to go back and press <Enter>");
 
-        var input = IOManager.Input();
-
-        if (input.Any((x) => char.IsLetter(x)))
+        do
         {
-            return _displayingFiles = false;
-        }
+            string? input = IOManager.Input();
 
-        var intInput = Convert.ToInt32(input);
-        while (_notValidInput)
-        {
-            if (intInput > _textFileArrayList.Count || intInput <= 0)
+            if (input is null || input.Any(char.IsLetter))
             {
-                IOManager.Write("Input to high, try again:");
-                intInput = Convert.ToInt32(IOManager.Input());
-            }
-            else
-            {
-                _notValidInput = false;
+                return null;
             }
 
-            _selectedFile = intInput;
-        }
+            int intInput = int.Parse(input);
 
-        return _displayingFiles = true;
-    }
+            if (intInput > _textFileArrayList.Count || intInput <= 0) IOManager.Write("Input to high, try again:");
+            else return _textFileArrayList[intInput - 1];
 
-    /// <summary>
-    /// Checks if there are existing files added previously
-    /// </summary>
-    /// <returns> returns selected file path with user input </returns>
-    public string GetSelectedFile()
-    {
-        if (_textFileArrayList != null) return _textFileArrayList[_selectedFile - 1];
-        return "No files are stored on disk";
+        } while (true);
     }
 
 
@@ -103,9 +79,8 @@ public class FileManager
     /// Checks if there are existing file names added previously
     /// </summary>
     /// <returns> returns selected file name with user input </returns>
-    public string RetrieveAllFileNames() 
+    public string[] RetrieveAllFileNames()
     {
-        if (_textFileNames != null) return _textFileNames[_selectedFile - 1];
-        return "No files are stored on disk";
+        return _textFileNames is null ? Array.Empty<string>() : _textFileNames.ToArray();
     }
 }
