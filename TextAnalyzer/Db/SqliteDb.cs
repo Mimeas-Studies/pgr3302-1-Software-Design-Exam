@@ -133,7 +133,7 @@ public class SqliteDb : IDbManager
         int scanId = reader.GetInt32(reader.GetOrdinal("ScanId"));
 
         AnalyzerResult result = new();
-        Dictionary<string, int> wordHeatMap = new();
+        Dictionary<string,int> wordHeatMap = new();
         Dictionary<string,int> charHeatMap = new();
         try
         {
