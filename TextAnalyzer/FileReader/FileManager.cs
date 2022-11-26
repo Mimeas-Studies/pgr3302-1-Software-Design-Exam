@@ -17,8 +17,11 @@ public class FileManager
     {
         // MainManager assumes a 'Resources' folder exists
         DirectoryInfo resources = new("Resources");
-        Logger.Warn("Resources folder not found, creating a new one");
-        if (!resources.Exists) resources.Create();
+        if (!resources.Exists)
+        {
+            Logger.Warn("Resources folder not found, creating a new one");
+            resources.Create();
+        }
     }
 
     /// <summary>
