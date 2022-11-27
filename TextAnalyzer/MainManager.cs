@@ -29,8 +29,8 @@ public class MainManager
     {
         while (true)
         {
-            IOManager.Write(_analyzerResult?.ToString());
-            string? option = IOManager.Input("Save Data?(y/n)")?.ToLower();
+            IoManager.Write(_analyzerResult?.ToString());
+            string? option = IoManager.Input("Save Data?(y/n)")?.ToLower();
             switch (option)
             {
                 case "y":
@@ -61,16 +61,16 @@ public class MainManager
         
         while (true)
         {
-            IOManager.ClearConsole();
-            IOManager.Write("Names of analysed text.");
+            IoManager.ClearConsole();
+            IoManager.Write("Names of analysed text.");
             foreach ((int i, AnalyzerResult result) in analyzerResultsList)
             {
-                IOManager.Write($"{i+1}. {result.SourceName}");
+                IoManager.Write($"{i+1}. {result.SourceName}");
             }
          
-            IOManager.Write("\nType in menu number to see stats and press <Enter>");
+            IoManager.Write("\nType in menu number to see stats and press <Enter>");
 
-            string? input = IOManager.Input("Type in <B> to go back press <Enter>");
+            string? input = IoManager.Input("Type in <B> to go back press <Enter>");
             if (string.IsNullOrWhiteSpace(input)) continue;
 
             if (input.Any(c => !char.IsNumber(c))) return false;
@@ -78,16 +78,16 @@ public class MainManager
             int selected = int.Parse(input) - 1;
             if (selected < 0 || selected >= analyzerResultsList.Count) continue;
 
-            IOManager.ClearConsole();
-            IOManager.Write("Stats of analysed text:");
-            IOManager.Write(analyzerResultsList[selected].result.ToString());
+            IoManager.ClearConsole();
+            IoManager.Write("Stats of analysed text:");
+            IoManager.Write(analyzerResultsList[selected].result.ToString());
             return true;
         }
     }
 
     private void ShowAnalysedTexts()
     {
-        IOManager.ClearConsole();
+        IoManager.ClearConsole();
         string? selectedFile = _fileManager.ChooseStoredFile();
         
         if (selectedFile is null) return;
@@ -102,7 +102,7 @@ public class MainManager
         IoManager.ClearConsole();
         if (RetrieveTitlesOfAnalysedTexts())
         {
-            IOManager.Input("Type enter to go back to main menu");
+            IoManager.Input("Type enter to go back to main menu");
         }
     }
 
@@ -113,35 +113,35 @@ public class MainManager
 
     private void EndProgram()
     {
-        IOManager.Write("\nExiting...");
+        IoManager.Write("\nExiting...");
     }
 
     private void Menu()
     {
         while (true)
         {
-            IOManager.ClearConsole();
+            IoManager.ClearConsole();
             Ui.PrintMenu();
-            string? selectedMenuOption = IOManager.Input("Type in menu option number");
+            string? selectedMenuOption = IoManager.Input("Type in menu option number");
             switch (selectedMenuOption)
             {
                 case "1":
-                    IOManager.ClearConsole();
+                    IoManager.ClearConsole();
                     ShowAnalysedTexts();
                     break;
 
                 case "2":
-                    IOManager.ClearConsole();
+                    IoManager.ClearConsole();
                     RetrieveTextStats();
                     break;
 
                 case "3":
-                    IOManager.ClearConsole();
+                    IoManager.ClearConsole();
                     WriteYourOwnText();
                     break;
                 
                 case "4":
-                    IOManager.ClearConsole();
+                    IoManager.ClearConsole();
                     EndProgram();
                     return;
                 default:

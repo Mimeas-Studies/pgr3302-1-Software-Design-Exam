@@ -7,8 +7,8 @@ public static class CreateNewFiles
         string? fileName = null;
         while (string.IsNullOrEmpty(fileName))
         {
-            IOManager.ClearConsole();
-            fileName = IOManager.Input("Enter file name: ");
+            IoManager.ClearConsole();
+            fileName = IoManager.Input("Enter file name: ");
         }
         
         string path = Path.Combine("Resources", fileName + ".txt");
@@ -19,13 +19,13 @@ public static class CreateNewFiles
             path
         );
 
-        IOManager.Write("Enter text and press enter 3 times to continue");
+        IoManager.Write("Enter text and press enter 3 times to continue");
         while (true)
         {
-            string? line = IOManager.Input();
+            string? line = IoManager.Input();
             if (line is null or "")
             {
-                string? confirm = IOManager.Input();
+                string? confirm = IoManager.Input();
                 if (confirm is null or "") break;
                 sw.WriteLine($"\n{confirm}");
                 continue;
@@ -38,7 +38,7 @@ public static class CreateNewFiles
         Ui.PrintSaveOrDiscard();
         while (true)
         {
-            string? input = IOManager.Input();
+            string? input = IoManager.Input();
             if (string.IsNullOrEmpty(input)) continue;
             if (input == "2") File.Delete(path);
             

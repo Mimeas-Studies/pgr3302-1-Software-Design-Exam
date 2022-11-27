@@ -139,8 +139,8 @@ public class SqliteDb : IDbManager
         
         try
         {
-            var wordHeatMap = ImportWordHeatMap(scanId);
-            var charHeatMap = ImportCharHeatMap(scanId);
+            wordHeatMap = ImportWordHeatMap(scanId);
+            charHeatMap = ImportCharHeatMap(scanId);
 
             result = new AnalyzerResult
             {
@@ -351,67 +351,6 @@ public class SqliteDb : IDbManager
         finally
         {
             _dbConnection.Close();
-        }
-    }
-
-<<<<<<<<< Temporary merge branch 1
-    private void SaveCharHeatMap(int scanId, Dictionary<string, int> heatmap)
-    {
-        try
-        {
-            foreach (var pair in heatmap)
-            {
-                SqliteCommand charMapCommand = _dbConnection.CreateCommand();
-                charMapCommand.CommandText =
-                    @"
-                            INSERT INTO CharMap
-                            ('ScanId', 'Character', 'Count')
-                            VALUES (
-                                @ScanId,
-                                @Character,
-                                @Count
-                            );
-                        ";
-
-                charMapCommand.Parameters.AddWithValue("@ScanId", scanId);
-                charMapCommand.Parameters.AddWithValue("@Character", pair.Key);
-                charMapCommand.Parameters.AddWithValue("@Count", pair.Value);
-                charMapCommand.ExecuteNonQuery();
-            }
-        }
-        catch (SqliteException sqliteError)
-        {
-            throw new Exception("Failed to save character heatmap", sqliteError);
-        }
-    }
-
-    private void SaveWordHeatMap(int scanId, Dictionary<string, int> heatmap)
-    {
-        try
-        {
-            foreach (var pair in heatmap)
-            {
-                SqliteCommand wordMapCommand = _dbConnection.CreateCommand();
-                wordMapCommand.CommandText =
-                    @"
-                        INSERT INTO WordMap
-                        ('ScanId', 'Word', 'Count')
-                        VALUES (
-                            @ScanId,
-                            @Word,
-                            @Count
-                        );
-                    ";
-
-                wordMapCommand.Parameters.AddWithValue("@ScanId", scanId);
-                wordMapCommand.Parameters.AddWithValue("@Word", pair.Key);
-                wordMapCommand.Parameters.AddWithValue("@Count", pair.Value);
-                wordMapCommand.ExecuteNonQuery();
-            }
-        }
-        catch (SqliteException sqliteError)
-        {
-            throw new Exception("Failed to save word heatmap", sqliteError);
         }
     }
 

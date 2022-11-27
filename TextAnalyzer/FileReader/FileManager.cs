@@ -42,8 +42,8 @@ public class FileManager
         _textFileArrayList = new List<string>();
         _textFileNames = new List<string>();
 
-        IOManager.ClearConsole();
-        IOManager.Write("Display texts that arent analysed.");
+        IoManager.ClearConsole();
+        IoManager.Write("Display texts that arent analysed.");
         DirectoryInfo directoryInfo = new ("Resources"); //Insert directory
         FileInfo[] files = directoryInfo.GetFiles("*.txt"); //Get files the end with .txt
 
@@ -56,16 +56,16 @@ public class FileManager
 
         while (true)
         {
-            IOManager.ClearConsole();
+            IoManager.ClearConsole();
             foreach ((int index, FileInfo file) in fileList)
             {
-                IOManager.Write($"{index+1}. {file.Name}");
+                IoManager.Write($"{index+1}. {file.Name}");
             }
 
-            IOManager.Write("\nType in menu option number and press <Enter> to analyse text");
-            IOManager.Write("Type in <B> to go back and press <Enter>");
+            IoManager.Write("\nType in menu option number and press <Enter> to analyse text");
+            IoManager.Write("Type in <B> to go back and press <Enter>");
             
-            string? input = IOManager.Input();
+            string? input = IoManager.Input();
             if (string.IsNullOrWhiteSpace(input) || input.Any(c => !char.IsNumber(c))) return null;
 
             int selected = int.Parse(input);

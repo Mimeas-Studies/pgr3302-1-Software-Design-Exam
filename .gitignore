@@ -3,3 +3,4 @@
 */obj/
 */.user
 *.sln.DotSettings.user
+/.vs
