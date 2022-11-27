@@ -1,11 +1,11 @@
 ﻿namespace TextAnalyzer.UI;
 
-public class CreateNewFiles
+public static class CreateNewFiles
 {
     internal static void CreateTxtFiles()
     {
-        IOManager.ClearConsole();
-        IOManager.Write("\nEnter file name: ");
+        IoManager.ClearConsole();
+        IoManager.Write("\nEnter file name: ");
         string fileName = Console.ReadLine();
 
 
@@ -19,11 +19,11 @@ public class CreateNewFiles
                     path
                 );
 
-                sw.Write(IOManager.Input("Enter text: "));
+                sw.Write(IoManager.Input("Enter text: "));
                 sw.Flush();
                 sw.Close();
                 Ui.PrintSaveOrDiscard();
-                if (IOManager.Input() == "2")
+                if (IoManager.Input() == "2")
                 {
                     File.Delete(path);
                 }

@@ -11,7 +11,7 @@ public class AnalyzerThread
     private Queue<string> Text { get; set; }
     private string Word { get; set; } = "";
     private readonly IEnumerator<string> _textStream;
-    
+
     private static readonly Regex Regex = new("(?:[^a-z0-9 ]|(?<=['\"])s)",
         RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled);
 
@@ -42,7 +42,7 @@ public class AnalyzerThread
             hasMore = GetNextWord();
         }
     }
-    
+
     private bool GetNextWord()
     {
         get_word:

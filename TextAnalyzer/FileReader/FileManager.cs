@@ -1,6 +1,7 @@
+using TextAnalyzer.Logging;
 using TextAnalyzer.UI;
 
-namespace TextAnalyzer;
+namespace TextAnalyzer.FileReader;
 
 /// <summary>
 /// Handles txt files by storing them in Queue's, displays them from directories and return them
@@ -11,7 +12,7 @@ public class FileManager
     private List<string>? _textFileNames;
     private int _selectedFile;
     private bool _notValidInput;
-    private bool _displayingFiles = false;
+    private bool _displayingFiles;
 
     public FileManager()
     {
@@ -43,25 +44,25 @@ public class FileManager
         _textFileArrayList = new List<string>();
         _textFileNames = new List<string>();
 
-        IOManager.ClearConsole();
-        IOManager.Write("Display texts that arent analysed.");
+        IoManager.ClearConsole();
+        IoManager.Write("Display texts that arent analysed.");
         var directoryInfo = new DirectoryInfo("Resources"); //Insert directory
         FileInfo[] files = directoryInfo.GetFiles("*.txt"); //Get files the end with .txt
         var counter = 0;
         foreach (FileInfo file in files)
         {
             counter++;
-            IOManager.Write(counter + ". " + file.Name);
+            IoManager.Write(counter + ". " + file.Name);
             _textFileNames.Add(file.Name);
             _textFileArrayList.Add(file.FullName);
         }
 
-        IOManager.Write("\nType in menu option number and press <Enter> to analyse text");
-        IOManager.Write("Type in <B> to go back and press <Enter>");
+        IoManager.Write("\nType in menu option number and press <Enter> to analyse text");
+        IoManager.Write("Type in <B> to go back and press <Enter>");
 
-        var input = IOManager.Input();
+        var input = IoManager.Input();
 
-        if (input.Any((x) => char.IsLetter(x)))
+        if (input.Any(char.IsLetter))
         {
             return _displayingFiles = false;
         }
@@ -71,8 +72,8 @@ public class FileManager
         {
             if (intInput > _textFileArrayList.Count || intInput <= 0)
             {
-                IOManager.Write("Input to high, try again:");
-                intInput = Convert.ToInt32(IOManager.Input());
+                IoManager.Write("Input to high, try again:");
+                intInput = Convert.ToInt32(IoManager.Input());
             }
             else
             {

@@ -1,7 +1,6 @@
 using System.Reflection;
-using TextAnalyzer.Logging;
 
-namespace TextAnalyzer;
+namespace TextAnalyzer.Logging;
 
 public class Logger
 {

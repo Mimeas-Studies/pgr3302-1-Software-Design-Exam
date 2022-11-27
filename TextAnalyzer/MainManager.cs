@@ -1,5 +1,6 @@
 ﻿using TextAnalyzer.Analyzer;
 using TextAnalyzer.Db;
+using TextAnalyzer.FileReader;
 using TextAnalyzer.UI;
 using TextAnalyzer.Logging;
 
@@ -27,19 +28,19 @@ public class MainManager
 
     private void SaveFileInDb()
     {
-        IOManager.Write(_analyzerResult?.ToString());
+        IoManager.Write(_analyzerResult?.ToString());
         Ui.PrintSaveOrDiscard();
         var option = Console.ReadLine();
         switch (option)
         {
             case "1":
                 _dbManager?.SaveData(_analyzerResult!);
-                IOManager.ClearConsole();
-                IOManager.Write("Data stored\n");
+                IoManager.ClearConsole();
+                IoManager.Write("Data stored\n");
                 break;
             case "2":
-                IOManager.ClearConsole();
-                IOManager.Write("Data discarded\n");
+                IoManager.ClearConsole();
+                IoManager.Write("Data discarded\n");
                 break;
         }
     }
@@ -52,38 +53,38 @@ public class MainManager
     private bool RetrieveTitlesOfAnalysedTexts()
     {
         var retrieveData = false;
-        IOManager.ClearConsole();
-        IOManager.Write("Names of analysed text.");
+        IoManager.ClearConsole();
+        IoManager.Write("Names of analysed text.");
         var counter = 0;
         var analyzerResultsList = _dbManager?.GetAll();
         for (var i = 0; i < analyzerResultsList!.Count; i++)
         {
             counter++;
-            IOManager.Write(counter + ". " + analyzerResultsList[i].SourceName);
+            IoManager.Write(counter + ". " + analyzerResultsList[i].SourceName);
         }
 
-        IOManager.Write("\nType in menu number to see stats and press <Enter>");
-        IOManager.Write("Type in <B> to go back press <Enter>");
+        IoManager.Write("\nType in menu number to see stats and press <Enter>");
+        IoManager.Write("Type in <B> to go back press <Enter>");
         var selectedTxtFile = Console.ReadLine();
         if (selectedTxtFile.ToUpper() == "B")
         {
             return retrieveData;
         }
-        else if (selectedTxtFile.Any((x) => char.IsLetter(x)))
+        else if (selectedTxtFile.Any(char.IsLetter))
         {
             return retrieveData;
         }
 
         retrieveData = true;
-        IOManager.ClearConsole();
-        IOManager.Write("Stats of analysed text:");
+        IoManager.ClearConsole();
+        IoManager.Write("Stats of analysed text:");
         Console.WriteLine(analyzerResultsList[Convert.ToInt32(selectedTxtFile) - 1]);
         return retrieveData;
     }
 
     private void ShowAnalysedTexts()
     {
-        IOManager.ClearConsole();
+        IoManager.ClearConsole();
         if (_fileManager.DisplayStoredFiles())
         {
             Ui.ProgressBar();
@@ -94,12 +95,12 @@ public class MainManager
 
     private void RetrieveTextStats()
     {
-        IOManager.ClearConsole();
+        IoManager.ClearConsole();
         if (RetrieveTitlesOfAnalysedTexts())
         {
             Ui.PrintBackToMainMenu();
             var i = Convert.ToInt32(Console.ReadLine());
-            IOManager.ClearConsole();
+            IoManager.ClearConsole();
             if (i != 1)
             {
                 _isProgramRunning = false;
@@ -114,36 +115,36 @@ public class MainManager
 
     private void EndProgram()
     {
-        IOManager.Write("\nExiting...");
+        IoManager.Write("\nExiting...");
         _isProgramRunning = false;
     }
 
     private void Menu()
     {
-        IOManager.ClearConsole();
-        IOManager.Write("\nType in menu option number");
+        IoManager.ClearConsole();
+        IoManager.Write("\nType in menu option number");
         Ui.PrintMenu();
         var selectedMenuOption = Console.ReadKey().KeyChar;
         switch (selectedMenuOption)
         {
             case '1':
-                IOManager.ClearConsole();
+                IoManager.ClearConsole();
                 ShowAnalysedTexts();
                 break;
 
             case '2':
-                IOManager.ClearConsole();
+                IoManager.ClearConsole();
                 RetrieveTextStats();
                 break;
 
             case '3':
-                IOManager.ClearConsole();
+                IoManager.ClearConsole();
                 WriteYourOwnText();
                 
                 break;
 
             case '4':
-                IOManager.ClearConsole();
+                IoManager.ClearConsole();
                 EndProgram();
                 break;
         }
