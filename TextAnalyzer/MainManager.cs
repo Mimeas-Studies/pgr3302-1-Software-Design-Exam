@@ -52,34 +52,38 @@ public class MainManager
 
     private bool RetrieveTitlesOfAnalysedTexts()
     {
-        bool retrieveData = false;
-        IOManager.ClearConsole();
-        IOManager.Write("Names of analysed text.");
-        int counter = 0;
-        var analyzerResultsList = _dbManager?.GetAll();
-        for (int i = 0; i < analyzerResultsList!.Count; i++)
+        
+        var analyzerResultsList = _dbManager?
+            .GetAll()
+            .Select((result, i)=> (i, result))
+            .ToList()
+            ?? new List<(int i, AnalyzerResult result)>(); // use empty list if _dbManager is null
+        
+        while (true)
         {
-            counter++;
-            IOManager.Write(counter + ". " + analyzerResultsList[i].SourceName);
+            IOManager.ClearConsole();
+            IOManager.Write("Names of analysed text.");
+            foreach ((int i, AnalyzerResult result) in analyzerResultsList)
+            {
+                IOManager.Write($"{i+1}. {result.SourceName}");
+            }
+         
+            IOManager.Write("\nType in menu number to see stats and press <Enter>");
+
+            string? input = IOManager.Input("Type in <B> to go back press <Enter>");
+            if (string.IsNullOrWhiteSpace(input)) continue;
+
+            if (input.Any(c => !char.IsNumber(c))) return false;
+
+            int selected = int.Parse(input) - 1;
+            if (selected < 0 || selected >= analyzerResultsList.Count) continue;
+
+            IOManager.ClearConsole();
+            IOManager.Write("Stats of analysed text:");
+            IOManager.Write(analyzerResultsList[selected].result.ToString());
+            return true;
         }
 
-        IOManager.Write("\nType in menu number to see stats and press <Enter>");
-        IOManager.Write("Type in <B> to go back press <Enter>");
-        var selectedTxtFile = Console.ReadLine();
-        if (selectedTxtFile.ToUpper() == "B")
-        {
-            return retrieveData;
-        }
-        else if (selectedTxtFile.Any((x) => char.IsLetter(x)))
-        {
-            return retrieveData;
-        }
-
-        retrieveData = true;
-        IOManager.ClearConsole();
-        IOManager.Write("Stats of analysed text:");
-        Console.WriteLine(analyzerResultsList[Convert.ToInt32(selectedTxtFile) - 1]);
-        return retrieveData;
     }
 
     private void ShowAnalysedTexts()

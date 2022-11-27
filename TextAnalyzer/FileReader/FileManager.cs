@@ -65,7 +65,7 @@ public class FileManager
             IOManager.Write("Type in <B> to go back and press <Enter>");
             
             string? input = IOManager.Input();
-            if (input is null || input.Any(c => !char.IsNumber(c))) return null;
+            if (string.IsNullOrWhiteSpace(input) || input.Any(c => !char.IsNumber(c))) return null;
 
             int selected = int.Parse(input);
             if (selected <= 0 || selected > _textFileArrayList.Count)
