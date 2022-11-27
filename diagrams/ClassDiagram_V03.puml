@@ -10,6 +10,7 @@ interface ISourceLoader {
 }
 
 interface IStoreManager {
+    ..Methods..
     + SaveResult(result: AnalyzerResult): void
     + GetScanList(): List<(string, DateTime)>
     + GetScan(sourceName: string, scanTime: DateTime): AnalyzerResult?
@@ -46,6 +47,7 @@ class MainManager {
 }
 
 class Ui {
+    ..Methods..
     + GetInput(message: string): Input
     + Display(message: string): void
 }
@@ -100,18 +102,18 @@ class SqliteDb {
 '-----------Relations------------
 
 UiManager <-- MainManager
-UiManager --> SourceManager
+UiManager --> ISourceLoader
 UiManager --> IStoreManager
 
 Ui <-- UiManager
 
-SourceManager <- MainManager
-ISourceLoader <- SourceManager
+ISourceLoader <- MainManager
+ISourceLoader  <|--  SourceManager
 
 MainManager --> AnalyzerManager
 AnalyzerManager --> AnalyzerThread
 
 MainManager -> IStoreManager
-IStoreManager o- SqliteDb
+IStoreManager <|-- SqliteDb
 
 @enduml
