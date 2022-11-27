@@ -28,21 +28,22 @@ public class MainManager
 
     private void SaveFileInDb()
     {
-        IOManager.Write(_analyzerResult?.ToString());
-        Ui.PrintSaveOrDiscard();
-        var option = Console.ReadLine();
-        switch (option)
+        while (true)
         {
-            case "1":
-                _dbManager?.SaveData(_analyzerResult!);
-                IOManager.ClearConsole();
-                IOManager.Write("Data stored\n");
-                break;
-            case "2":
-                IOManager.ClearConsole();
-                IOManager.Write("Data discarded\n");
-                break;
+            IOManager.Write(_analyzerResult?.ToString());
+            var option = IOManager.Input("Save Data?(y/n)")?.ToLower();
+            switch (option)
+            {
+                case "y":
+                    _dbManager?.SaveData(_analyzerResult!);
+                    return;
+                case "n":
+                    return;
+                default:
+                    continue;
+            }
         }
+
     }
 
     private void GenerateTxtFile()
