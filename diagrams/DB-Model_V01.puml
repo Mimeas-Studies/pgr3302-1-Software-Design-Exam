@@ -22,7 +22,7 @@ class charmap {
     count: int
 }
 
-Scan "*"--"1,1" wordmap
-Scan "*"--"1,1" charmap
+Scan "*"--"1" wordmap
+Scan "*"--"1  " charmap
 
 @enduml

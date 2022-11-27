@@ -1,6 +1,6 @@
 ﻿namespace TextAnalyzer.UI;
 
-public class CreateNewFiles
+public static class CreateNewFiles
 {
     internal static void CreateTxtFiles()
     {
