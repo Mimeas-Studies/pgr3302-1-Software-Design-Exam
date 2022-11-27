@@ -3,7 +3,7 @@ namespace TextAnalyzer.UI;
 /// <summary>
 /// IOManager, user-provided objects, stores assets, outputs and loads them as inputs to downstream assets
 /// </summary>
-public class IOManager
+public static class IoManager
 {
 //Input, writes user specified data to standard input stream, and reads the characters from the input stream
     public static string? Input(string text)

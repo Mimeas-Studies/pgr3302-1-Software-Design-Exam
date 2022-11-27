@@ -12,16 +12,5 @@
 
 A text analysis program in C#, that reads and analyses 
 and relays information concerning the contents and relevant 
-data, ie.(longest String, most frequently used string or char,
-etc.). 
+data, ie.(Total string and char count, frequently used string and char and longest string). 
 
-### To-Do-List
-
-- [ ] Initialize main program
-- [ ] Read txt.file
-- [ ] Use Code first EF Core
-
-### Feature list
-* [ ] Coloured U/I
-* [ ] Add multithreading to AnalyseManager
-* [ ] (AnalysesManager) User can check if input (String) exists in file.

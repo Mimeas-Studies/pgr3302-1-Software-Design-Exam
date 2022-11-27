@@ -100,7 +100,7 @@ public class MainManager
 
     private void RetrieveTextStats()
     {
-        IOManager.ClearConsole();
+        IoManager.ClearConsole();
         if (RetrieveTitlesOfAnalysedTexts())
         {
             IOManager.Input("Type enter to go back to main menu");

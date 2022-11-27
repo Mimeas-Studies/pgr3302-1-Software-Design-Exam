@@ -1,8 +1,7 @@
-﻿namespace TextAnalyzer;
+﻿using System.Text;
 
-using System;
-using System.Text;
-using System.Threading;
+namespace TextAnalyzer.UI;
+
 /// <summary>
 /// Used a exiting github project as the basis of this code for something fun for the user to look at and hide loading
 /// text analysis https://gist.github.com/DanielSWolf/0ab6a96899cc5377bf54
@@ -10,7 +9,7 @@ using System.Threading;
 public class ProgressBar : IDisposable, IProgress<double>
 {
     private const int BlockCount = 10;
-    private readonly TimeSpan animationInterval = TimeSpan.FromSeconds(1.0 / 8);
+    private readonly TimeSpan _animationInterval = TimeSpan.FromSeconds(1.0 / 8);
     private const string Animation = @"|/-\";
 
     private readonly Timer _timer;
@@ -80,7 +79,7 @@ public class ProgressBar : IDisposable, IProgress<double>
 
     private void ResetTimer()
     {
-        _timer.Change(animationInterval, TimeSpan.FromMilliseconds(-1));
+        _timer.Change(_animationInterval, TimeSpan.FromMilliseconds(-1));
     }
 
     public void Dispose()

@@ -1,6 +1,7 @@
 using System.Reflection;
 using Microsoft.Data.Sqlite;
 using TextAnalyzer.Analyzer;
+using TextAnalyzer.Logging;
 
 namespace TextAnalyzer.Db;
 
@@ -49,7 +50,7 @@ public class SqliteDb : IDbManager
             DataSource = path,
             Mode = SqliteOpenMode.ReadWriteCreate
         }.ToString();
-        
+
         Logger.Info($"Connecting to '{connectionString}'");
         if (!File.Exists(path)) Logger.Warn("Database file does not exist, creating a new one");
 
@@ -129,7 +130,7 @@ public class SqliteDb : IDbManager
     private AnalyzerResult DeserializeScan(SqliteDataReader reader)
     {
         Logger.Trace("Deserializing a scan");
-        
+
         int scanId = reader.GetInt32(reader.GetOrdinal("ScanId"));
 
         AnalyzerResult result = new();
@@ -137,9 +138,9 @@ public class SqliteDb : IDbManager
         Dictionary<string,int> charHeatMap = new();
         try
         {
-            wordHeatMap = ImportWordHeatMap(scanId);
-            charHeatMap = ImportCharHeatMap(scanId);
-            
+            var wordHeatMap = ImportWordHeatMap(scanId);
+            var charHeatMap = ImportCharHeatMap(scanId);
+
             result = new AnalyzerResult
             {
                 ScanTime = reader.GetDateTime(reader.GetOrdinal("ScanTime")),
@@ -177,7 +178,6 @@ public class SqliteDb : IDbManager
                     mapReader.GetInt32(mapReader.GetOrdinal("Count"))
                 );
             }
-
         }
         catch (SqliteException e)
         {
@@ -197,7 +197,7 @@ public class SqliteDb : IDbManager
             mapQuery.CommandText = "SELECT * FROM WordMap WHERE ScanId = @id";
             mapQuery.Parameters.AddWithValue("@id", scanId);
             SqliteDataReader mapReader = mapQuery.ExecuteReader();
-            
+
             while (mapReader.Read())
             {
                 wordMap.Add(
@@ -205,14 +205,14 @@ public class SqliteDb : IDbManager
                     mapReader.GetInt32(mapReader.GetOrdinal("Count"))
                 );
             }
-            mapReader.Close();
 
+            mapReader.Close();
         }
         catch (SqliteException e)
         {
             throw new Exception("Failed to read word heatmap", e);
         }
-        
+
         return wordMap;
     }
     
@@ -328,7 +328,6 @@ public class SqliteDb : IDbManager
             {
                 throw new Exception("Failed to get ScanId");
             }
-
         }
         catch (Exception err)
         {
@@ -343,7 +342,6 @@ public class SqliteDb : IDbManager
         {
             SaveCharHeatMap(scanId, result.HeatmapChar);
             SaveWordHeatMap(scanId, result.HeatmapWord);
- 
         }
         catch (SqliteException err)
         {
@@ -363,7 +361,7 @@ public class SqliteDb : IDbManager
         try
         {
             _dbConnection.Open();
-            
+
             SqliteCommand query = _dbConnection.CreateCommand();
             query.CommandText = @"
                 SELECT * FROM Scans
@@ -390,7 +388,7 @@ public class SqliteDb : IDbManager
         {
             _dbConnection.Close();
         }
-        
+
         return scan;
     }
 
@@ -416,7 +414,6 @@ public class SqliteDb : IDbManager
             {
                 scanList.Add(DeserializeScan(queryReader));
             }
-
         }
         catch (Exception err)
         {
@@ -450,7 +447,6 @@ public class SqliteDb : IDbManager
             {
                 scanList.Add(DeserializeScan(query));
             }
-
         }
         catch (Exception err)
         {
