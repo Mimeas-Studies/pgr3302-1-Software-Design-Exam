@@ -16,10 +16,10 @@ public class MainManager
     private AnalyzerResult? _analyzerResult;
     private readonly IDbManager? _dbManager = new SqliteDb();
 
-    private void ReadAndAnalyseFile(string filename)
+    private void ReadAndAnalyseFile(string filename, int threads)
     {
         IEnumerator<string> textStream = FileManager.GetText(filename);
-        _analyzerManager = new AnalyzerManager(textStream, 8);
+        _analyzerManager = new AnalyzerManager(textStream, threads);
 
         _analyzerResult = _analyzerManager.StartAnalyze();
         _analyzerResult.SourceName = filename;
@@ -91,9 +91,21 @@ public class MainManager
         string? selectedFile = _fileManager.ChooseStoredFile();
         
         if (selectedFile is null) return;
+
+        int threadCount = 0;
+        while (threadCount is 0)
+        {
+            IoManager.ClearConsole();
+            string? input = IoManager.Input("How many threads do you want to use");
+            if (string.IsNullOrWhiteSpace(input) || input.Any(c => !char.IsNumber(c))) continue;
+            
+            int number = int.Parse(input);
+            if (number < 0) continue;
+            threadCount = number;
+        }
         
         Ui.ProgressBar();
-        ReadAndAnalyseFile(selectedFile);
+        ReadAndAnalyseFile(selectedFile, threadCount);
         SaveFileInDb();
     }
 
