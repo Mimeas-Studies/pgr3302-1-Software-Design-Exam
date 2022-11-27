@@ -1,33 +1,48 @@
 ﻿namespace TextAnalyzer.UI;
 
-public class CreateNewFiles
+public static class CreateNewFiles
 {
     internal static void CreateTxtFiles()
     {
-        IOManager.ClearConsole();
-        IOManager.Write("\nEnter file name: ");
-        string fileName = Console.ReadLine();
-
-
-        if (fileName != null)
+        string? fileName = null;
+        while (string.IsNullOrEmpty(fileName))
         {
-            string path = Path.Combine("Resources", fileName + ".txt");
+            IOManager.ClearConsole();
+            fileName = IOManager.Input("Enter file name: ");
+        }
+        
+        string path = Path.Combine("Resources", fileName + ".txt");
+        
+        if (File.Exists(path)) return;
+        
+        StreamWriter sw = new StreamWriter(
+            path
+        );
 
-            if (!File.Exists(path))
+        IOManager.Write("Enter text and press enter 3 times to continue");
+        while (true)
+        {
+            string? line = IOManager.Input();
+            if (line is null or "")
             {
-                StreamWriter sw = new StreamWriter(
-                    path
-                );
-
-                sw.Write(IOManager.Input("Enter text: "));
-                sw.Flush();
-                sw.Close();
-                Ui.PrintSaveOrDiscard();
-                if (IOManager.Input() == "2")
-                {
-                    File.Delete(path);
-                }
+                string? confirm = IOManager.Input();
+                if (confirm is null or "") break;
+                sw.WriteLine($"\n{confirm}");
+                continue;
             }
+            sw.WriteLine(line);
+        }
+        
+        sw.Flush();
+        sw.Close();
+        Ui.PrintSaveOrDiscard();
+        while (true)
+        {
+            string? input = IOManager.Input();
+            if (string.IsNullOrEmpty(input)) continue;
+            if (input == "2") File.Delete(path);
+            
+            return;
         }
     }
 }

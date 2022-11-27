@@ -6,11 +6,16 @@ namespace TextAnalyzer.UI;
 public class IOManager
 {
 //Input, writes user specified data to standard input stream, and reads the characters from the input stream
-    public static string? Input(string text = "")
+    public static string? Input(string text)
     {
         Console.WriteLine(text);
         var input = Console.ReadLine();
         return input;
+    }
+
+    public static string? Input()
+    {
+        return Console.ReadLine();
     }
 
 //Standard writeline, writes specified data to input stream
