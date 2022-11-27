@@ -83,7 +83,6 @@ public class MainManager
             IOManager.Write(analyzerResultsList[selected].result.ToString());
             return true;
         }
-
     }
 
     private void ShowAnalysedTexts()
@@ -100,7 +99,7 @@ public class MainManager
 
     private void RetrieveTextStats()
     {
-        IOManager.ClearConsole();
+        IoManager.ClearConsole();
         if (RetrieveTitlesOfAnalysedTexts())
         {
             IOManager.Input("Type enter to go back to main menu");

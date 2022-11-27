@@ -1,3 +1,4 @@
+using TextAnalyzer.Logging;
 using TextAnalyzer.UI;
 
 namespace TextAnalyzer.FileReader;
