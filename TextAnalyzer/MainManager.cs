@@ -3,6 +3,9 @@ using TextAnalyzer.Db;
 using TextAnalyzer.FileReader;
 using TextAnalyzer.UI;
 using TextAnalyzer.Logging;
+using TextAnalyzer.Actions;
+using TextAnalyzer.ActionUI;
+using Action = TextAnalyzer.Actions.Action;
 
 namespace TextAnalyzer;
 
@@ -11,161 +14,42 @@ namespace TextAnalyzer;
 /// </summary>
 public class MainManager
 {
-    private readonly FileManager? _fileManager = new FileManager();
-    private AnalyzerManager? _analyzerManager;
-    private AnalyzerResult? _analyzerResult;
-    private readonly IDbManager? _dbManager = new SqliteDb();
-    private static bool _isProgramRunning = true;
+    internal MainMenuAction mainMenu;
 
-    private void ReadAndAnalyseFile(string filename)
+    public MainManager()
     {
-        IEnumerator<string> textStream = FileManager.GetText(filename);
-        _analyzerManager = new AnalyzerManager(textStream, 8);
-
-        _analyzerResult = _analyzerManager.StartAnalyze();
-        _analyzerResult.SourceName = filename;
-    }
-
-    private void SaveFileInDb()
-    {
-        IOManager.Write(_analyzerResult?.ToString());
-        Ui.PrintSaveOrDiscard();
-        var option = Console.ReadLine();
-        switch (option)
+        mainMenu = new MainMenuAction(new List<Action>()
         {
-            case "1":
-                _dbManager?.SaveData(_analyzerResult!);
-                IOManager.ClearConsole();
-                IOManager.Write("Data stored\n");
-                break;
-            case "2":
-                IOManager.ClearConsole();
-                IOManager.Write("Data discarded\n");
-                break;
-        }
-    }
-
-    private void GenerateTxtFile()
-    {
-        CreateNewFiles.CreateTxtFiles();
-    }
-
-    private bool RetrieveTitlesOfAnalysedTexts()
-    {
-        var retrieveData = false;
-        IOManager.ClearConsole();
-        IOManager.Write("Names of analysed text.");
-        var counter = 0;
-        var analyzerResultsList = _dbManager?.GetAll();
-        for (var i = 0; i < analyzerResultsList!.Count; i++)
-        {
-            counter++;
-            IOManager.Write(counter + ". " + analyzerResultsList[i].SourceName);
-        }
-
-        IOManager.Write("\nType in menu number to see stats and press <Enter>");
-        IOManager.Write("Type in <B> to go back press <Enter>");
-        var selectedTxtFile = Console.ReadLine();
-        if (selectedTxtFile.ToUpper() == "B")
-        {
-            return retrieveData;
-        }
-        else if (selectedTxtFile.Any((x) => char.IsLetter(x)))
-        {
-            return retrieveData;
-        }
-
-        retrieveData = true;
-        IOManager.ClearConsole();
-        IOManager.Write("Stats of analysed text:");
-        Console.WriteLine(analyzerResultsList[Convert.ToInt32(selectedTxtFile) - 1]);
-        return retrieveData;
-    }
-
-    private void ShowAnalysedTexts()
-    {
-        IOManager.ClearConsole();
-        string? selectedFile = _fileManager.ChooseStoredFile();
-        
-        if (selectedFile is null) return;
-        
-        Ui.ProgressBar();
-        ReadAndAnalyseFile(selectedFile);
-        SaveFileInDb();
-    }
-
-    private void RetrieveTextStats()
-    {
-        IOManager.ClearConsole();
-        if (RetrieveTitlesOfAnalysedTexts())
-        {
-            Ui.PrintBackToMainMenu();
-            var i = Convert.ToInt32(Console.ReadLine());
-            IOManager.ClearConsole();
-            if (i != 1)
+            new EmptyAction("Empty Action 1"),
+            new EmptyAction("Empty Action 2"),
+            new MenuLoopAction(new List<Action>()
             {
-                _isProgramRunning = false;
-            }
-        }
+                new EmptyAction("Empty sub-action 1"),
+                new MenuLoopAction(new List<Action>()
+                {
+                    new EmptyAction("empty sub-sub-action"),
+                    new MenuAction(new List<Action>()
+                    {
+                        new EmptyAction("Yes"),
+                        new EmptyAction("No")
+                    }, "yes/no menu")
+                })
+            }, "Loopable menu")
+        });
     }
 
-    private void WriteYourOwnText()
+    public void Start()
     {
-        GenerateTxtFile();
+        mainMenu.Act();
     }
-
-    private void EndProgram()
-    {
-        IOManager.Write("\nExiting...");
-        _isProgramRunning = false;
-    }
-
-    private void Menu()
-    {
-        IOManager.ClearConsole();
-        IOManager.Write("\nType in menu option number");
-        Ui.PrintMenu();
-        var selectedMenuOption = Console.ReadKey().KeyChar;
-        switch (selectedMenuOption)
-        {
-            case '1':
-                IOManager.ClearConsole();
-                ShowAnalysedTexts();
-                break;
-
-            case '2':
-                IOManager.ClearConsole();
-                RetrieveTextStats();
-                break;
-
-            case '3':
-                IOManager.ClearConsole();
-                WriteYourOwnText();
-                
-                break;
-
-            case '4':
-                IOManager.ClearConsole();
-                EndProgram();
-                break;
-        }
-    }
-
+    
     public static void Main(string[] args)
     {
         Logger.SetLevel(LogLevel.Info);
         Logger.Info("Initializing Application");
-
         MainManager mainManager = new();
-        
-        //Infinite while loop of the main menu switch case, while isProgramRunning set to true,
-        //false value set to five in switch case, exiting program '
-        Logger.Info("Running main loop");
-        while (_isProgramRunning)
-        {
-            mainManager.Menu();
-        }
 
-        Logger.Info("Exited Application");
+        Logger.Info("Running main loop");
+        mainManager.Start();
     }
 }

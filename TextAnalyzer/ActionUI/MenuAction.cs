@@ -4,15 +4,16 @@ using TextAnalyzer.Actions;
 
 public class MenuAction: Action
 {
-    private List<(int, Action)> actions;
+    public List<Action> actions;
 
-    public MenuAction(IEnumerable<Action> actions)
+    public MenuAction(List<Action> actionList, string name="Menu action")
     {
-        this.actions = actions.Select((action, i) => (i, action)).ToList();
-
+        if (actionList.Count < 1) throw new Exception("Missing actions to form a meaningful menu");
+        Message = name;
+        actions = actionList;
     }
 
-    public override string Message { get; } = "Choose an action";
+    public override string Message { get; internal set; }
     
     public override void Act()
     {
@@ -44,19 +45,23 @@ public class MenuAction: Action
         }
 
         done: ;
-        return actions[highlighted].Item2;
+        return actions[highlighted];
     }
 
     private void DrawMenu(int highlight)
     {
-        foreach ((int, Action) action in actions)
+        Console.Clear();
+        Console.WriteLine("Choose an action");
+        foreach ((int, Action) action in actions
+                     .Select((action, i) => (i, action))
+                 )
         {
             if (highlight == action.Item1)
             {
                 Console.BackgroundColor = ConsoleColor.White;
                 Console.ForegroundColor = ConsoleColor.Black;
             }
-            Console.WriteLine($"{action.Item1}. ${action.Item2}");
+            Console.WriteLine($"{action.Item1}. {action.Item2.Message}");
             Console.ResetColor();
         }
     }
