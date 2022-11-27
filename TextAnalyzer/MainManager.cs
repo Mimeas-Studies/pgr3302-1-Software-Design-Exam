@@ -83,7 +83,6 @@ public class MainManager
             IOManager.Write(analyzerResultsList[selected].result.ToString());
             return true;
         }
-
     }
 
     private void ShowAnalysedTexts()
