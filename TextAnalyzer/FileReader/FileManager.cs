@@ -43,35 +43,37 @@ public class FileManager
 
         IOManager.ClearConsole();
         IOManager.Write("Display texts that arent analysed.");
-        DirectoryInfo directoryInfo = new DirectoryInfo("Resources"); //Insert directory
+        DirectoryInfo directoryInfo = new ("Resources"); //Insert directory
         FileInfo[] files = directoryInfo.GetFiles("*.txt"); //Get files the end with .txt
-        int counter = 0;
-        foreach (FileInfo file in files)
+
+        (int, FileInfo)[] fileList = files.Select((file, i) => (i, file)).ToArray();
+        foreach ((int _, FileInfo file) in fileList)
         {
-            counter++;
-            IOManager.Write(counter + ". " + file.Name);
             _textFileNames.Add(file.Name);
             _textFileArrayList.Add(file.FullName);
         }
 
-        IOManager.Write("\nType in menu option number and press <Enter> to analyse text");
-        IOManager.Write("Type in <B> to go back and press <Enter>");
-
-        do
+        while (true)
         {
-            string? input = IOManager.Input();
-
-            if (input is null || input.Any(char.IsLetter))
+            IOManager.ClearConsole();
+            foreach ((int index, FileInfo file) in fileList)
             {
-                return null;
+                IOManager.Write($"{index+1}. {file.Name}");
             }
 
-            int intInput = int.Parse(input);
+            IOManager.Write("\nType in menu option number and press <Enter> to analyse text");
+            IOManager.Write("Type in <B> to go back and press <Enter>");
+            
+            string? input = IOManager.Input();
+            if (input is null || input.Any(c => !char.IsNumber(c))) return null;
 
-            if (intInput > _textFileArrayList.Count || intInput <= 0) IOManager.Write("Input to high, try again:");
-            else return _textFileArrayList[intInput - 1];
-
-        } while (true);
+            int selected = int.Parse(input);
+            if (selected <= 0 || selected > _textFileArrayList.Count)
+            {
+                continue;
+            }
+            return _textFileArrayList[selected -1];
+        }
     }
 
 
