@@ -45,6 +45,7 @@ public class AnalyzerManager
 
         AnalyzerResult finishedResult = new();
 
-        return Results.Aggregate(finishedResult, (current, result) => current + result);
+        var test = Results.Aggregate(finishedResult, (current, result) => current + result);
+        return test;
     }
 }

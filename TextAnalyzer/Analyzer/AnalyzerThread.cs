@@ -32,6 +32,8 @@ public class AnalyzerThread
         bool hasMore = GetNextWord();
         while (hasMore)
         {
+            string tmpWord = Regex.Replace(Word, string.Empty);
+            Word = tmpWord;
             TotalWordCount();
             TotalCharCount();
             CheckLongestWord();
@@ -69,7 +71,11 @@ public class AnalyzerThread
 
     private void TotalWordCount()
     {
-        Result.TotalWordCount++;
+        string word = Regex.Replace(Word, string.Empty);
+        if (word != "")
+        {
+            Result.TotalWordCount++;
+        }
     }
 
     private void TotalCharCount()
@@ -80,11 +86,9 @@ public class AnalyzerThread
 
     private void CheckLongestWord()
     {
-        string word = Regex.Replace(Word, string.Empty);
-
-        if (word.Length > Result.LongestWord.Length)
+        if (Word.Length > Result.LongestWord.Length)
         {
-            Result.LongestWord = word;
+            Result.LongestWord = Word;
         }
     }
 
