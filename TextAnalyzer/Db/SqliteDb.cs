@@ -133,11 +133,14 @@ public class SqliteDb : IDbManager
 
         int scanId = reader.GetInt32(reader.GetOrdinal("ScanId"));
 
-        AnalyzerResult result;
+        AnalyzerResult result = new();
+        Dictionary<string,int> wordHeatMap = new();
+        Dictionary<string,int> charHeatMap = new();
+        
         try
         {
-            var wordHeatMap = ImportWordHeatMap(scanId);
-            var charHeatMap = ImportCharHeatMap(scanId);
+            wordHeatMap = ImportWordHeatMap(scanId);
+            charHeatMap = ImportCharHeatMap(scanId);
 
             result = new AnalyzerResult
             {
@@ -212,6 +215,66 @@ public class SqliteDb : IDbManager
         }
 
         return wordMap;
+    }
+    
+    private void SaveCharHeatMap(int scanId , Dictionary<string, int> heatmap )
+    {
+        try
+        {
+            foreach (var pair in heatmap)
+            {
+                SqliteCommand charMapCommand = _dbConnection.CreateCommand();
+                charMapCommand.CommandText =
+                    @"
+                            INSERT INTO CharMap
+                            ('ScanId', 'Character', 'Count')
+                            VALUES (
+                                @ScanId,
+                                @Character,
+                                @Count
+                            );
+                        ";
+
+                charMapCommand.Parameters.AddWithValue("@ScanId", scanId);
+                charMapCommand.Parameters.AddWithValue("@Character", pair.Key);
+                charMapCommand.Parameters.AddWithValue("@Count", pair.Value);
+                charMapCommand.ExecuteNonQuery();
+            }
+        }
+        catch (SqliteException sqliteError)
+        {
+            throw new  Exception("Failed to save character heatmap", sqliteError);
+        }
+    }
+    
+    private void SaveWordHeatMap(int scanId, Dictionary<string, int> heatmap)
+    {
+        try
+        {
+            foreach (var pair in heatmap)
+            {
+                SqliteCommand wordMapCommand = _dbConnection.CreateCommand();
+                wordMapCommand.CommandText =
+                    @"
+                        INSERT INTO WordMap
+                        ('ScanId', 'Word', 'Count')
+                        VALUES (
+                            @ScanId,
+                            @Word,
+                            @Count
+                        );
+                    ";
+
+                wordMapCommand.Parameters.AddWithValue("@ScanId", scanId);
+                wordMapCommand.Parameters.AddWithValue("@Word", pair.Key);
+                wordMapCommand.Parameters.AddWithValue("@Count", pair.Value);
+                wordMapCommand.ExecuteNonQuery();
+            }
+        }
+        catch (SqliteException sqliteError)
+        {
+            throw new Exception("Failed to save word heatmap", sqliteError);
+        }
     }
 
     #region IDbManager Implementation
@@ -291,70 +354,9 @@ public class SqliteDb : IDbManager
         }
     }
 
-    private void SaveCharHeatMap(int scanId, Dictionary<string, int> heatmap)
-    {
-        try
-        {
-            foreach (var pair in heatmap)
-            {
-                SqliteCommand charMapCommand = _dbConnection.CreateCommand();
-                charMapCommand.CommandText =
-                    @"
-                            INSERT INTO CharMap
-                            ('ScanId', 'Character', 'Count')
-                            VALUES (
-                                @ScanId,
-                                @Character,
-                                @Count
-                            );
-                        ";
-
-                charMapCommand.Parameters.AddWithValue("@ScanId", scanId);
-                charMapCommand.Parameters.AddWithValue("@Character", pair.Key);
-                charMapCommand.Parameters.AddWithValue("@Count", pair.Value);
-                charMapCommand.ExecuteNonQuery();
-            }
-        }
-        catch (SqliteException sqliteError)
-        {
-            throw new Exception("Failed to save character heatmap", sqliteError);
-        }
-    }
-
-    private void SaveWordHeatMap(int scanId, Dictionary<string, int> heatmap)
-    {
-        try
-        {
-            foreach (var pair in heatmap)
-            {
-                SqliteCommand wordMapCommand = _dbConnection.CreateCommand();
-                wordMapCommand.CommandText =
-                    @"
-                        INSERT INTO WordMap
-                        ('ScanId', 'Word', 'Count')
-                        VALUES (
-                            @ScanId,
-                            @Word,
-                            @Count
-                        );
-                    ";
-
-                wordMapCommand.Parameters.AddWithValue("@ScanId", scanId);
-                wordMapCommand.Parameters.AddWithValue("@Word", pair.Key);
-                wordMapCommand.Parameters.AddWithValue("@Count", pair.Value);
-                wordMapCommand.ExecuteNonQuery();
-            }
-        }
-        catch (SqliteException sqliteError)
-        {
-            throw new Exception("Failed to save word heatmap", sqliteError);
-        }
-    }
-
-
     public AnalyzerResult? GetScan(string sourceName, DateTime scanTime)
     {
-        Logger.Debug($"Retrieving scan {sourceName}:{scanTime}");
+        Logger.Info($"Retrieving scan done {scanTime} for {sourceName}");
 
         AnalyzerResult? scan = null;
         try
@@ -393,7 +395,7 @@ public class SqliteDb : IDbManager
 
     public List<AnalyzerResult> GetWithSource(string scanName)
     {
-        Logger.Debug($"Retrieving all saved scans for {scanName}");
+        Logger.Info($"Retrieving list of saved scans for {scanName}");
         List<AnalyzerResult> scanList = new();
 
         try
@@ -429,7 +431,8 @@ public class SqliteDb : IDbManager
 
     public List<AnalyzerResult> GetAll()
     {
-        Logger.Debug("Retrieving all saved scans");
+        
+        Logger.Info("Retrieving all saved scans");
 
         List<AnalyzerResult> scanList = new();
         try

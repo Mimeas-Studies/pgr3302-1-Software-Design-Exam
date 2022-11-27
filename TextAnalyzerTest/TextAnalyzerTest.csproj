@@ -17,14 +17,5 @@
     <ItemGroup>
       <ProjectReference Include="..\TextAnalyzer\TextAnalyzer.csproj" />
     </ItemGroup>
-    
-    <ItemGroup>
-      <Content Include="Resources\Lorem Ipsum 500.txt">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Resources\Random Ipsum 1 500 131.txt">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-    </ItemGroup>
 
 </Project>

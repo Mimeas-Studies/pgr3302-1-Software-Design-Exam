@@ -10,16 +10,15 @@ public class FileManager
 {
     private List<string>? _textFileArrayList;
     private List<string>? _textFileNames;
-    private int _selectedFile;
-    private bool _notValidInput;
-    private bool _displayingFiles;
 
     public FileManager()
     {
         // MainManager assumes a 'Resources' folder exists
         DirectoryInfo resources = new("Resources");
+        
+        if (resources.Exists) return;
         Logger.Warn("Resources folder not found, creating a new one");
-        if (!resources.Exists) resources.Create();
+        resources.Create();
     }
 
     /// <summary>
@@ -38,62 +37,44 @@ public class FileManager
     /// Displays files that are located in the resources directory
     /// checks in user input is valid based on files from directory
     /// </summary>
-    internal bool DisplayStoredFiles()
+    internal string? ChooseStoredFile()
     {
-        _notValidInput = true;
         _textFileArrayList = new List<string>();
         _textFileNames = new List<string>();
 
         IoManager.ClearConsole();
         IoManager.Write("Display texts that arent analysed.");
-        var directoryInfo = new DirectoryInfo("Resources"); //Insert directory
+        DirectoryInfo directoryInfo = new ("Resources"); //Insert directory
         FileInfo[] files = directoryInfo.GetFiles("*.txt"); //Get files the end with .txt
-        var counter = 0;
-        foreach (FileInfo file in files)
+
+        (int, FileInfo)[] fileList = files.Select((file, i) => (i, file)).ToArray();
+        foreach ((int _, FileInfo file) in fileList)
         {
-            counter++;
-            IoManager.Write(counter + ". " + file.Name);
             _textFileNames.Add(file.Name);
             _textFileArrayList.Add(file.FullName);
         }
 
-        IoManager.Write("\nType in menu option number and press <Enter> to analyse text");
-        IoManager.Write("Type in <B> to go back and press <Enter>");
-
-        var input = IoManager.Input();
-
-        if (input.Any(char.IsLetter))
+        while (true)
         {
-            return _displayingFiles = false;
-        }
-
-        var intInput = Convert.ToInt32(input);
-        while (_notValidInput)
-        {
-            if (intInput > _textFileArrayList.Count || intInput <= 0)
+            IoManager.ClearConsole();
+            foreach ((int index, FileInfo file) in fileList)
             {
-                IoManager.Write("Input to high, try again:");
-                intInput = Convert.ToInt32(IoManager.Input());
-            }
-            else
-            {
-                _notValidInput = false;
+                IoManager.Write($"{index+1}. {file.Name}");
             }
 
-            _selectedFile = intInput;
+            IoManager.Write("\nType in menu option number and press <Enter> to analyse text");
+            IoManager.Write("Type in <B> to go back and press <Enter>");
+            
+            string? input = IoManager.Input();
+            if (string.IsNullOrWhiteSpace(input) || input.Any(c => !char.IsNumber(c))) return null;
+
+            int selected = int.Parse(input);
+            if (selected <= 0 || selected > _textFileArrayList.Count)
+            {
+                continue;
+            }
+            return _textFileArrayList[selected -1];
         }
-
-        return _displayingFiles = true;
-    }
-
-    /// <summary>
-    /// Checks if there are existing files added previously
-    /// </summary>
-    /// <returns> returns selected file path with user input </returns>
-    public string GetSelectedFile()
-    {
-        if (_textFileArrayList != null) return _textFileArrayList[_selectedFile - 1];
-        return "No files are stored on disk";
     }
 
 
@@ -101,9 +82,8 @@ public class FileManager
     /// Checks if there are existing file names added previously
     /// </summary>
     /// <returns> returns selected file name with user input </returns>
-    public string RetrieveAllFileNames() 
+    public string[] RetrieveAllFileNames()
     {
-        if (_textFileNames != null) return _textFileNames[_selectedFile - 1];
-        return "No files are stored on disk";
+        return _textFileNames is null ? Array.Empty<string>() : _textFileNames.ToArray();
     }
 }

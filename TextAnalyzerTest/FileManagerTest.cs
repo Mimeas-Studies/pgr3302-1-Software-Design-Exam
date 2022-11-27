@@ -18,7 +18,8 @@ public class Tests {
             count += lines.Current.Split(" ").Length;
         }
         
-        Assert.That(count, Is.EqualTo(500));
+        //This result is from un-regex text that makes empty words because of \r\n
+        Assert.That(count, Is.EqualTo(503));
     }
 
     [Test]
@@ -32,7 +33,8 @@ public class Tests {
             count += lines.Current.Split(" ").Length;
         }
         
-        Assert.That(count, Is.EqualTo(1_500_131));
+        //This result is from un-regexe text that makes empty words because of \r\n
+        Assert.That(count, Is.EqualTo(1_750_154));
     }
 
     [Test]

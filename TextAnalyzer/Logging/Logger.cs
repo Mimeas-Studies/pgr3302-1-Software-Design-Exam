@@ -10,7 +10,7 @@ public class Logger
 
     private Logger()
     {
-        _level = LogLevel.Warn;
+        _level = LogLevel.Info;
 
         string path = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().Location).LocalPath) ?? ".";
         path += "/log.txt";

@@ -3,13 +3,14 @@ using System.Text.RegularExpressions;
 namespace TextAnalyzer.Analyzer;
 
 /// <summary>
-/// Class made for multithreading. Initialised from AnalyzerManager and get feeded words to analyze.
+/// Class made for multithreading. Initialised from AnalyzerManager and get fed words to analyze.
 /// </summary>
 public class AnalyzerThread
 {
     private AnalyzerResult Result { get; }
     private Queue<string> Text { get; set; }
     private string Word { get; set; } = "";
+    private string WordRegex { get; set; } = "";
     private readonly IEnumerator<string> _textStream;
 
     private static readonly Regex Regex = new("(?:[^a-z0-9 ]|(?<=['\"])s)",
@@ -32,6 +33,7 @@ public class AnalyzerThread
         bool hasMore = GetNextWord();
         while (hasMore)
         {
+            WordRegex = Regex.Replace(Word, string.Empty);
             TotalWordCount();
             TotalCharCount();
             CheckLongestWord();
@@ -69,41 +71,42 @@ public class AnalyzerThread
 
     private void TotalWordCount()
     {
-        Result.TotalWordCount++;
+        if (Word != "")
+        {
+            Result.TotalWordCount++;
+        }
     }
 
     private void TotalCharCount()
     {
-        var array = Word.ToCharArray();
+        char[] array = Word.ToCharArray();
         Result.TotalCharCount += array.Length;
     }
 
     private void CheckLongestWord()
     {
-        var word = Regex.Replace(Word, String.Empty);
-
-        if (word.Length > Result.LongestWord.Length)
+        if (WordRegex.Length > Result.LongestWord.Length)
         {
-            Result.LongestWord = word;
+            Result.LongestWord = WordRegex;
         }
     }
 
     private void HeatmapWord()
     {
-        if (Result.HeatmapWord.ContainsKey(Word))
+        if (Result.HeatmapWord.ContainsKey(WordRegex))
         {
-            Result.HeatmapWord[Word]++;
+            Result.HeatmapWord[WordRegex]++;
         }
         else
         {
-            Result.HeatmapWord.Add(Word, 1);
+            Result.HeatmapWord.Add(WordRegex, 1);
         }
     }
 
     private void HeatmapChar()
     {
-        var wordArray = Word.ToCharArray();
-        foreach (var ch in wordArray)
+        char[] wordArray = Word.ToCharArray();
+        foreach (char ch in wordArray)
         {
             if (Result.HeatmapChar.ContainsKey(ch.ToString()))
             {

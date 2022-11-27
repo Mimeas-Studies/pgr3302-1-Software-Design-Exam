@@ -34,32 +34,26 @@ public class AnalyzerResult
             Total word count: {TotalWordCount} 
             Total char count: {TotalCharCount}
             Longest word: {LongestWord}
-            Word Heatmap: {ToStringHeatmap(HeatmapWord)} 
-            Char Heatmap: {ToStringHeatmap(HeatmapChar)}
+            Word Heatmap: {AnalyzerResult.ToStringHeatmap(HeatmapWord)} 
+            Char Heatmap: {AnalyzerResult.ToStringHeatmap(HeatmapChar)}
         ";
     }
 
     private static string ToStringHeatmap(Dictionary<string, int> heatMap)
     {
-        var highestValue = 0;
-        var strValue = "";
+        KeyValuePair<string, int> highest = heatMap
+            .Aggregate((highest, current) => current.Value > highest.Value ? current : highest);
 
-        foreach (var pair in heatMap)
-        {
-            if (pair.Value <= highestValue) continue;
-            highestValue += pair.Value;
-            strValue = pair.Key;
-        }
-
-        return ($" {strValue} | Counted {highestValue} times,");
+        return ($" {highest.Key} | Counted {highest.Value} times,");
     }
 
     public static AnalyzerResult operator +(AnalyzerResult a, AnalyzerResult b)
     {
-        var newResult = new AnalyzerResult();
-
-        newResult.TotalWordCount = a.TotalWordCount + b.TotalWordCount;
-        newResult.TotalCharCount = a.TotalCharCount + b.TotalCharCount;
+        AnalyzerResult newResult = new AnalyzerResult
+        {
+            TotalWordCount = a.TotalWordCount + b.TotalWordCount,
+            TotalCharCount = a.TotalCharCount + b.TotalCharCount
+        };
 
         if (a.LongestWord.Length > b.LongestWord.Length) newResult.LongestWord = a.LongestWord;
         else newResult.LongestWord = b.LongestWord;

@@ -26,29 +26,26 @@ public class AnalyzerManager
     /// Start with making empty AnalyzerResult based on threads.
     /// Initiate threads and feed from common IEnumerator<string/>
     /// </summary>
-    /// <returns>Complete AnalyzerResult from feeded text</returns>
+    /// <returns>Complete AnalyzerResult from fed text</returns>
     public AnalyzerResult StartAnalyze()
     {
         for (int i = 0; i < Threads.Length; i++)
         {
             Results[i] = new AnalyzerResult();
-            var analyzer = new AnalyzerThread(Results[i], _textStream);
+            AnalyzerThread analyzer = new(Results[i], _textStream);
 
             Threads[i] = new Thread(analyzer.Start);
             Threads[i].Start();
         }
 
-        foreach (var thread in Threads)
+        foreach (Thread thread in Threads)
         {
             thread.Join();
         }
 
-        var finishedResult = new AnalyzerResult();
-        foreach (var result in Results)
-        {
-            finishedResult += result;
-        }
+        AnalyzerResult finishedResult = new();
 
-        return finishedResult;
+        var test = Results.Aggregate(finishedResult, (current, result) => current + result);
+        return test;
     }
 }
