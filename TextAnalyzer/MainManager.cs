@@ -15,7 +15,6 @@ public class MainManager
     private AnalyzerManager? _analyzerManager;
     private AnalyzerResult? _analyzerResult;
     private readonly IDbManager? _dbManager = new SqliteDb();
-    private static bool _isProgramRunning = true;
 
     private void ReadAndAnalyseFile(string filename)
     {
@@ -28,21 +27,22 @@ public class MainManager
 
     private void SaveFileInDb()
     {
-        IOManager.Write(_analyzerResult?.ToString());
-        Ui.PrintSaveOrDiscard();
-        var option = Console.ReadLine();
-        switch (option)
+        while (true)
         {
-            case "1":
-                _dbManager?.SaveData(_analyzerResult!);
-                IOManager.ClearConsole();
-                IOManager.Write("Data stored\n");
-                break;
-            case "2":
-                IOManager.ClearConsole();
-                IOManager.Write("Data discarded\n");
-                break;
+            IOManager.Write(_analyzerResult?.ToString());
+            string? option = IOManager.Input("Save Data?(y/n)")?.ToLower();
+            switch (option)
+            {
+                case "y":
+                    _dbManager?.SaveData(_analyzerResult!);
+                    return;
+                case "n":
+                    return;
+                default:
+                    continue;
+            }
         }
+
     }
 
     private void GenerateTxtFile()
@@ -52,12 +52,12 @@ public class MainManager
 
     private bool RetrieveTitlesOfAnalysedTexts()
     {
-        var retrieveData = false;
+        bool retrieveData = false;
         IOManager.ClearConsole();
         IOManager.Write("Names of analysed text.");
-        var counter = 0;
+        int counter = 0;
         var analyzerResultsList = _dbManager?.GetAll();
-        for (var i = 0; i < analyzerResultsList!.Count; i++)
+        for (int i = 0; i < analyzerResultsList!.Count; i++)
         {
             counter++;
             IOManager.Write(counter + ". " + analyzerResultsList[i].SourceName);
@@ -99,13 +99,7 @@ public class MainManager
         IOManager.ClearConsole();
         if (RetrieveTitlesOfAnalysedTexts())
         {
-            Ui.PrintBackToMainMenu();
-            var i = Convert.ToInt32(Console.ReadLine());
-            IOManager.ClearConsole();
-            if (i != 1)
-            {
-                _isProgramRunning = false;
-            }
+            IOManager.Input("Type enter to go back to main menu");
         }
     }
 
@@ -117,37 +111,39 @@ public class MainManager
     private void EndProgram()
     {
         IOManager.Write("\nExiting...");
-        _isProgramRunning = false;
     }
 
     private void Menu()
     {
-        IOManager.ClearConsole();
-        IOManager.Write("\nType in menu option number");
-        Ui.PrintMenu();
-        var selectedMenuOption = Console.ReadKey().KeyChar;
-        switch (selectedMenuOption)
+        while (true)
         {
-            case '1':
-                IOManager.ClearConsole();
-                ShowAnalysedTexts();
-                break;
+            IOManager.ClearConsole();
+            Ui.PrintMenu();
+            string? selectedMenuOption = IOManager.Input("Type in menu option number");
+            switch (selectedMenuOption)
+            {
+                case "1":
+                    IOManager.ClearConsole();
+                    ShowAnalysedTexts();
+                    break;
 
-            case '2':
-                IOManager.ClearConsole();
-                RetrieveTextStats();
-                break;
+                case "2":
+                    IOManager.ClearConsole();
+                    RetrieveTextStats();
+                    break;
 
-            case '3':
-                IOManager.ClearConsole();
-                WriteYourOwnText();
+                case "3":
+                    IOManager.ClearConsole();
+                    WriteYourOwnText();
+                    break;
                 
-                break;
-
-            case '4':
-                IOManager.ClearConsole();
-                EndProgram();
-                break;
+                case "4":
+                    IOManager.ClearConsole();
+                    EndProgram();
+                    return;
+                default:
+                    continue;
+            }
         }
     }
 
@@ -158,13 +154,8 @@ public class MainManager
 
         MainManager mainManager = new();
         
-        //Infinite while loop of the main menu switch case, while isProgramRunning set to true,
-        //false value set to five in switch case, exiting program '
         Logger.Info("Running main loop");
-        while (_isProgramRunning)
-        {
-            mainManager.Menu();
-        }
+        mainManager.Menu();
 
         Logger.Info("Exited Application");
     }
